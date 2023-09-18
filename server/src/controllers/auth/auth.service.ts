@@ -1,11 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from 'src/schema/auth/user.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  validateUser(email: string, password: string) {
+    throw new Error('Method not implemented.');
+  }
+
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
+
+  async create(dto: RegisterDto) {
+    const existUser = await this.userModel.findOne({ email: dto.email });
+    if (existUser !== null) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const newUser = new this.userModel(dto);
+    return await newUser.save();
+  }
+
+  async login(dto: LoginDto) {
+    const existUser = await this.userModel.findOne({ email: dto.email });
+
+    if (existUser === null) {
+      throw new UnauthorizedException('Email not found');
+    }
+    if (existUser.password !== dto.password) {
+      throw new UnauthorizedException('Incorrect password');
+    }
+    return { statusCode: 200 };
   }
 
   findAll() {
@@ -16,7 +49,7 @@ export class AuthService {
     return `This action returns a #${id} auth`;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
+  update(id: number, dto: RegisterDto) {
     return `This action updates a #${id} auth`;
   }
 
