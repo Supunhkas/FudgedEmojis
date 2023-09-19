@@ -14,9 +14,16 @@ export class RequestService {
   constructor(
     @InjectModel(Request.name) private requestModel: Model<RequestDocument>,
   ) {}
-  
+
   async create(createRequestDto: CreateRequestDto) {
-    const newRequest = new this.requestModel(createRequestDto);
+    const requestData = {
+      ...createRequestDto,
+      voucherCode: '',
+      remarks: '',
+      mailSent: false,
+      status: 0,
+    };
+    const newRequest = new this.requestModel(requestData);
     return await newRequest.save();
   }
 
@@ -35,22 +42,55 @@ export class RequestService {
     return request;
   }
 
-  async update(id: number, updateRequestDto: UpdateRequestDto) {
-    const updatedRequest = await this.requestModel.findByIdAndUpdate(
-      id,
+  async update(id: string, updateRequestDto: UpdateRequestDto) {
+    const updatedRequest = await this.requestModel.updateOne(
+      { _id: id },
       { $set: updateRequestDto },
-      { new: true },
-    );
+    ).exec();
 
-    return updatedRequest;
+    console.log(updatedRequest )
+    if (updatedRequest.modifiedCount !== 1 ) {
+      throw new BadRequestException('Update failed!');
+    }
+    let target = '';
+
+    updateRequestDto.status === 1
+      ? (target = 'Approved')
+      : (target = 'Rejected');
+
+    return { message: `${target} successfully` };
   }
 
-  async remove(id: number) {
-    const deletedRequest = await this.requestModel.deleteOne({ _id: id });
+  // async remove(id: number) {
+  //   const deletedRequest = await this.requestModel.deleteOne({ _id: id });
 
-    if (deletedRequest.deletedCount === 0) {
-      throw new BadRequestException('Cannot be deleted');
-    }
-    return { message: 'Successfully deleted' };
+  //   if (deletedRequest.deletedCount === 0) {
+  //     throw new BadRequestException('Cannot be deleted');
+  //   }
+  //   return { message: 'Successfully deleted' };
+  // }
+
+  // request with spinner value
+  async getAllRequestWithSpinner() {
+    const allRequestsWithSpinner = await this.requestModel.find({}).exec();
+    return allRequestsWithSpinner;
+  }
+
+  // requests without spinner value
+  async getAllRequestWithoutSpinner() {
+    const allRequests = await this.requestModel.find({}).exec();
+    return allRequests;
+  }
+
+  // all completed requests
+  async getAllCompletedRequests() {
+    const allCompleted = await this.requestModel.find({status: 1}).exec();
+    return allCompleted;
+  }
+
+  // all rejected requests
+  async getAllRejectedRequests() {
+    const allRejected = await this.requestModel.find({status: 3}).exec();
+    return allRejected;
   }
 }

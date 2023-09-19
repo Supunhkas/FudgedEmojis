@@ -13,4 +13,7 @@ export class CreateRequestDto {
 
     @IsOptional()
     spinnerResult: number;
+
+    @IsNotEmpty()
+    spinBy: string;
 }

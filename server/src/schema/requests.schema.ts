@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { UserDocument } from "./auth/user.schema";
 
 export type RequestDocument = Request & Document;
 
@@ -16,10 +17,22 @@ export class Request {
 
     @Prop()
     imgUrl: string;
+    
+    @Prop()
+    voucherCode: string;
 
     @Prop()
-    description: string;
-    
+    remarks: string;
+
+    @Prop()
+    mailSent: boolean;
+
+    @Prop()
+    status: number;
+
+    @Prop({type:String, ref: 'User'})
+    spinBy: UserDocument['id']
+
 
 }
 
