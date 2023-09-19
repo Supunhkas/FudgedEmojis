@@ -64,5 +64,11 @@ export class RequestController {
   getAllRejectedRequests() {
     return this.requestService.getAllRejectedRequests();
   }
+
+  //email 
+  @Post('email')
+ async getEmail(@Body() payload) {
+  await this.requestService.sendMail()
+  }
 }
 

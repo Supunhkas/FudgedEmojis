@@ -93,4 +93,8 @@ export class RequestService {
     const allRejected = await this.requestModel.find({status: 3}).exec();
     return allRejected;
   }
+
+  //send mail 
+  async sendMail(){}
+
 }
