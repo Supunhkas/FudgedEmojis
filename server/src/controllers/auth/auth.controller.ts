@@ -13,28 +13,28 @@ export class AuthController {
   }
 
   @Post('login')
-    async login(@Req() dto: LoginDto) {
+    async login(@Body() dto: LoginDto) {
       return await this.authService.login(dto);
     }
   
 
-  @Get()
+  @Get('all-users')
   findAll() {
     return this.authService.findAll();
   }
 
-  @Get(':id')
+  @Get('user/:id')
   findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+    return this.authService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   update(@Param('id') id: string, @Body() dto: RegisterDto) {
     return this.authService.update(+id, dto);
   }
 
-  @Delete(':id')
+  @Delete('remove/:id')
   remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+    return this.authService.remove(id);
   }
 }

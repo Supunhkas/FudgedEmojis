@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Request, RequestDocument } from 'src/schema/requests.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class RequestService {
-  create(createRequestDto: CreateRequestDto) {
-    return 'This action adds a new request';
+  constructor(
+    @InjectModel(Request.name) private requestModel: Model<RequestDocument>,
+  ) {}
+  
+  async create(createRequestDto: CreateRequestDto) {
+    const newRequest = new this.requestModel(createRequestDto);
+    return await newRequest.save();
   }
 
-  findAll() {
-    return `This action returns all request`;
+  async findAll() {
+    const allRequets = await this.requestModel.find().exec();
+    return allRequets;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} request`;
+  async findOne(id: string) {
+    const filter = { _id: id };
+    const request = await this.requestModel.findOne(filter).exec();
+    if (!request) {
+      throw new NotFoundException(`request with ID ${id} not found.`);
+    }
+
+    return request;
   }
 
-  update(id: number, updateRequestDto: UpdateRequestDto) {
-    return `This action updates a #${id} request`;
+  async update(id: number, updateRequestDto: UpdateRequestDto) {
+    const updatedRequest = await this.requestModel.findByIdAndUpdate(
+      id,
+      { $set: updateRequestDto },
+      { new: true },
+    );
+
+    return updatedRequest;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} request`;
+  async remove(id: number) {
+    const deletedRequest = await this.requestModel.deleteOne({ _id: id });
+
+    if (deletedRequest.deletedCount === 0) {
+      throw new BadRequestException('Cannot be deleted');
+    }
+    return { message: 'Successfully deleted' };
   }
 }

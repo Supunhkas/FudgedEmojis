@@ -8,16 +8,29 @@ import { LoginDto } from './dto/login.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/schema/auth/user.schema';
 import { Model } from 'mongoose';
+import { JwtPayload } from './jwt/jwt.payload';
+import { JwtProvider } from './jwt/jwt.provider';
 
 @Injectable()
 export class AuthService {
-  validateUser(email: string, password: string) {
-    throw new Error('Method not implemented.');
-  }
-
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly jwtProvider: JwtProvider,
   ) {}
+
+  async validateUser(payload: JwtPayload) {
+    const currentUser = await this.userModel
+      .findOne({
+        email: payload.email,
+      })
+      .select('-password');
+
+    if (!currentUser) {
+      throw new UnauthorizedException('Unauthorized user');
+    }
+
+    return currentUser;
+  }
 
   async create(dto: RegisterDto) {
     const existUser = await this.userModel.findOne({ email: dto.email });
@@ -30,30 +43,47 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const existUser = await this.userModel.findOne({ email: dto.email });
+    try {
+      const existUser = await this.userModel.findOne({ email: dto.email });
 
-    if (existUser === null) {
-      throw new UnauthorizedException('Email not found');
+      if (!existUser) {
+        throw new UnauthorizedException('Email not found');
+      }
+
+      if (existUser.password !== dto.password) {
+        throw new UnauthorizedException('Incorrect password');
+      }
+      const payload: JwtPayload = {
+        name: existUser.name,
+        email: existUser.email,
+        _id: existUser._id,
+       
+      };
+      const token = await this.jwtProvider.generateToken(payload);
+
+      return { statusCode: 200, token: token };
+    } catch (error) {
+      console.error('Login error:', error);
+      throw new UnauthorizedException('Authentication failed');
     }
-    if (existUser.password !== dto.password) {
-      throw new UnauthorizedException('Incorrect password');
-    }
-    return { statusCode: 200 };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async findAll() {
+    return await this.userModel.find().select('-password').exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+ async findOne(id: string) {
+  return await this.userModel
+  .findOne({ _id: id })
+  .select('-password')
+  .exec();
   }
 
   update(id: number, dto: RegisterDto) {
     return `This action updates a #${id} auth`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} auth`;
   }
 }
