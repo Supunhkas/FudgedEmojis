@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { MulterModule } from '@nestjs/platform-express';
 
 
 @Module({
@@ -18,8 +19,16 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
+          host: 'smtp.gmail.com',
+          port: 587, 
+          secure: true, 
+          auth: {
+            user: '',
+            pass: '',
+          },
+        },
         defaults: {
-          from: 'jayakabaraya@gmail.com',
+          from: '',
         },
         template: {
           dir: __dirname + 'mails',
@@ -28,9 +37,11 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
             strict: true,
           },
         },
-      }}),
-    
+      }),
     }),
+    MulterModule.register({
+      dest: './files',
+    })
   
   ],
   controllers: [AppController],

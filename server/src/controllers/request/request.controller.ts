@@ -3,16 +3,20 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
+  UseInterceptors,
   Put,
   UseGuards,
+  UploadedFile,
 } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { JwtAuthGuard } from 'src/config/guards/jwt-auth.guard';
+import { Express } from 'express'
+import {FileInterceptor} from '@nestjs/platform-express';
+import { error } from 'console';
+
 
 @Controller('request')
 export class RequestController {
@@ -70,5 +74,16 @@ export class RequestController {
  async getEmail(@Body() payload) {
   await this.requestService.sendMail()
   }
-}
 
+
+  // file upload 
+
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file'),
+  )
+  async uploadedFile(@UploadedFile() file) {
+      return this.requestService.uploadFile(file)
+  
+}
+}
