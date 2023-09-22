@@ -7,6 +7,7 @@ import { Breadcrumb, Layout, Menu, Button } from 'antd';
 import { Outlet, Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
 import logo from '../assets/logo.png';
+import colorLogo from '../assets/colorLogo.png';
 import { ConfigProvider, theme, Card } from "antd";
 import { BulbOutlined, StarOutlined } from '@ant-design/icons';
 import { Switch, Space } from 'antd';
@@ -97,7 +98,7 @@ const AdminLayout = () => {
         {/* Sidebar */}
         <Sider trigger={null} collapsible collapsed={collapsed}>
 
-          <div className="demo-logo-vertical" style={{ height: '65px' , background: isDarkMode? 'black ' :'white' }}> <img src={logo} alt="logo" style={{ width: '100%', height: '100%', objectFit:'contain' }} /> </div>
+          <div className="demo-logo-vertical" style={{ height: '65px' , background: isDarkMode? 'black ' :'white' }}> <img src={!isDarkMode? logo : colorLogo} alt="logo" style={{ width: '100%', height: '100%', objectFit:'contain' }} /> </div>
 
           <Menu
             mode="inline"
@@ -157,7 +158,7 @@ const AdminLayout = () => {
               textAlign: 'center',
             }}
           >
-            Fudges Emojis
+            Fudged Emojis
           </Footer>
         </Layout>
       </Layout>

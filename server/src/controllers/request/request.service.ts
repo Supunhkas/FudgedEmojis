@@ -42,7 +42,14 @@ export class RequestService {
   }
 
   async findAll() {
-    const allRequets = await this.requestModel.find().exec();
+    const allRequets = await this.requestModel
+      .find()
+      .sort({ createdAt: -1 })
+      .exec()
+      .catch((error) => {
+        console.error(error);
+        throw new error();
+      });
     return allRequets;
   }
 
@@ -102,22 +109,39 @@ export class RequestService {
   }
 
   //send mail
-  async sendMail() {
-    this.mailService
-      .sendMail({
-        to: 'supunh.kas@gmail.com.com',
-        from: 'supunharshana36@gmail.coms.com',
-        subject: 'Testing Nest MailerModule ✔',
-        text: 'welcome',
-        html: '<b>welcome</b>',
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+  async sendMail(emailData: any) {
+    return  await this.mailService.sendMail({
+      to: emailData.to,
+      from: emailData.from,
+      subject: emailData.subject,
+       template: '../../mails/template.hbs',
+      context: emailData.context,
+    });
   }
+  // async sendMail(emailData: any) {
+  //   const dynamicData = {
+  //     subject: 'Dynamic Email Subject',
+  //     greeting: 'Hello!',
+  //     message: 'This is a dynamic email message.',
+  //     dynamicContent: 'This content is dynamic.',
+  //   };
+  //   this.mailService
+  //     .sendMail({
+  //       to: 'jayakabaraya@gmail.com',
+  //       from: 'supunharshana36@gmail.com',
+  //       subject: dynamicData.subject,
+  //       template: '../../mails/template.hbs',
+  //       context: dynamicData,  text: 'welcome',
+  //       html: '<b>welcome</b>',
+  //     })
+  //     .then((data) => {
+  //       console.log(data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }
 
   //  image upload
   async uploadFile(file) {

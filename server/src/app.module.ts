@@ -19,9 +19,9 @@ import { MulterModule } from '@nestjs/platform-express';
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: 'smtp.gmail.com',
-          port: 587, 
-          secure: true, 
+          host: 'smtp.freesmtpservers.com',
+          port: 25, 
+          secure: false, 
           auth: {
             user: '',
             pass: '',
@@ -31,7 +31,7 @@ import { MulterModule } from '@nestjs/platform-express';
           from: '',
         },
         template: {
-          dir: __dirname + 'mails',
+          dir: __dirname + './mails/template.hbs',
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

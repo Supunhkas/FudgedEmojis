@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { UserDocument } from "./auth/user.schema";
+import { Types } from "mongoose";
 
 export type RequestDocument = Request & Document;
 
@@ -29,10 +30,10 @@ export class Request {
 
     @Prop()
     status: number;
-
-    @Prop({type:String, ref: 'User'})
-    spinBy: UserDocument['id']
-
+ 
+    @Prop({type: Types.ObjectId, ref: 'User'})
+    spinBy: Types.ObjectId;
+    
 
 }
 

@@ -13,10 +13,7 @@ import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { JwtAuthGuard } from 'src/config/guards/jwt-auth.guard';
-import { Express } from 'express'
-import {FileInterceptor} from '@nestjs/platform-express';
-import { error } from 'console';
-
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('request')
 export class RequestController {
@@ -24,8 +21,8 @@ export class RequestController {
 
   @UseGuards(JwtAuthGuard)
   @Post('add')
-  create(@Body() createRequestDto: CreateRequestDto) {
-    return this.requestService.create(createRequestDto);
+  create(@Body() dto: CreateRequestDto) {
+    return this.requestService.create(dto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -40,8 +37,8 @@ export class RequestController {
   }
 
   @Put('update/:id')
-  update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto) {
-    return this.requestService.update(id, updateRequestDto);
+  update(@Param('id') id: string, @Body() dto: UpdateRequestDto) {
+    return this.requestService.update(id, dto);
   }
 
   // @Delete('remove/:id')
@@ -69,21 +66,23 @@ export class RequestController {
     return this.requestService.getAllRejectedRequests();
   }
 
-  //email 
+  //email
   @Post('email')
- async getEmail(@Body() payload) {
-  await this.requestService.sendMail()
+  async getEmail(@Body() emailData: any) {
+    try {
+      await this.requestService.sendMail(emailData);
+      return { message: 'Email sent successfully' };
+    } catch (error) {
+      console.log(error)
+      return { error: 'Failed to send email' };
+    }
   }
 
-
-  // file upload 
+  // file upload
 
   @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file'),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadedFile(@UploadedFile() file) {
-      return this.requestService.uploadFile(file)
-  
-}
+    return this.requestService.uploadFile(file);
+  }
 }
