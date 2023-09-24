@@ -16,4 +16,7 @@ export class CreateRequestDto {
 
     @IsNotEmpty()
     spinBy: string;
+
+    @IsOptional()
+    voucherType: string;
 }

@@ -19,24 +19,24 @@ import { MulterModule } from '@nestjs/platform-express';
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: 'smtp.freesmtpservers.com',
-          port: 25, 
+          host: 'smtp.gmail.com',
+          port: 587, 
           secure: false, 
           auth: {
-            user: '',
-            pass: '',
+            user: 'fudgedemoji@gmail.com',
+            pass: 'ruiwatofyhkcxvro',
           },
         },
-        defaults: {
-          from: '',
-        },
-        template: {
-          dir: __dirname + './mails/template.hbs',
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
-          },
-        },
+        // defaults: {
+        //   from: '',
+        // },
+        // template: {
+        //   dir: __dirname + './mails/template.hbs',
+        //   adapter: new HandlebarsAdapter(),
+        //   options: {
+        //     strict: true,
+        //   },
+        // },
       }),
     }),
     MulterModule.register({

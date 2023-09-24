@@ -23,6 +23,9 @@ export class Request {
     voucherCode: string;
 
     @Prop()
+    voucherType: string;
+
+    @Prop()
     remarks: string;
 
     @Prop()

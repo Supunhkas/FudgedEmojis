@@ -19,7 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class RequestController {
   constructor(private readonly requestService: RequestService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('add')
   create(@Body() dto: CreateRequestDto) {
     return this.requestService.create(dto);
@@ -85,4 +85,5 @@ export class RequestController {
   async uploadedFile(@UploadedFile() file) {
     return this.requestService.uploadFile(file);
   }
+  
 }

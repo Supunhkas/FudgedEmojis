@@ -54,10 +54,9 @@ export class AuthService {
         throw new UnauthorizedException('Incorrect password');
       }
       const payload: JwtPayload = {
-        name: existUser.name,
+        name: existUser.firstName,
         email: existUser.email,
         _id: existUser._id,
-       
       };
       const token = await this.jwtProvider.generateToken(payload);
 
@@ -72,18 +71,9 @@ export class AuthService {
     return await this.userModel.find().select('-password').exec();
   }
 
- async findOne(id: string) {
-  return await this.userModel
-  .findOne({ _id: id })
-  .select('-password')
-  .exec();
+  async findOne(id: string) {
+    return await this.userModel.findOne({ _id: id }).select('-password').exec();
   }
 
-  update(id: number, dto: RegisterDto) {
-    return `This action updates a #${id} auth`;
-  }
 
-  remove(id: string) {
-    return `This action removes a #${id} auth`;
-  }
 }

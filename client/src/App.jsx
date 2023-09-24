@@ -31,6 +31,7 @@ function App() {
             <Route path='send' element={<SendEmails />} />
             <Route path='waiting' element={<WaitingForSpin/>}/>
 
+
           </Route>
 
 
