@@ -43,7 +43,7 @@ export class RequestService {
 
   async findAll() {
     const allRequests = await this.requestModel
-      .find()
+      .find({status: 0})
       .sort({ createdAt: -1 })
       .exec()
       .catch((error) => {

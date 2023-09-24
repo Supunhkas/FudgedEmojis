@@ -1,8 +1,27 @@
 import Title from 'antd/es/typography/Title'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
+import axios from 'axios';
 
 const NewRequest = () => {
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const accessToken = localStorage.getItem("token");
+
+  const [spinData,setSpinData] = useState([])
+  useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    };
+    axios.get(`${baseUrl}/request/all`, config).then((res) => {
+      setSpinData(res.data)
+      console.log(res.data)  
+    }).catch((err) => {
+      console.log(err)
+    })
+  },[])
   const columns = [
     {
       title: 'Name',
