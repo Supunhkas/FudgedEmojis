@@ -5,6 +5,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TopNavBar from '../components/TopNavBar';
 import WheelComponent from '../components/WheelComponent';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -28,6 +30,7 @@ function TabPanel(props) {
 }
 
 function SimpleTabs() {
+  const { id } = useParams();
   const [value, setValue] = useState(0);
   const [chances, setChances] = useState('1');
   const segments = [
@@ -49,13 +52,40 @@ function SimpleTabs() {
   const segColors = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F"];
   const onFinished = (winner) => {
     setChances('0');
+    saveResultToDatabase(winner, 'Amazon'); 
     console.log(winner);
   };
   const onFinished2 = (winner) => {
     setChances('0');
+    saveResultToDatabase(winner, 'Shopify');
     console.log(winner);
   };
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const accessToken = localStorage.getItem("token");
 
+
+  const saveResultToDatabase = (result, selectedTab) => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const data = {
+      result: result,
+      selectedTab: selectedTab,
+    };
+  
+    axios
+    .put(`${baseUrl}/request/update/:${id}`, config,data)
+      .then((response) => {
+        console.log('Result saved successfully:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error saving result:', error);
+      });
+  };
+  
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

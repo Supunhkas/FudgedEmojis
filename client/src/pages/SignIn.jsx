@@ -51,23 +51,22 @@ export default function SignIn() {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
-console.log(localStorage.getItem('token'))  
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(formData)
 
     try {
       const response = await axios.post(`${baseUrl}/auth/login`, formData);
 
       if (response.data.statusCode === 200) {
-        localStorage.setItem('token', response.data.token)
+        console.log(response.data);
+        localStorage.setItem("token", response.data.token);
+
         navigate("/");
       } else {
-       
         console.error("Login failed");
       }
     } catch (error) {
-     
       console.error("Error:", error);
     }
   };

@@ -2,6 +2,7 @@ import Title from 'antd/es/typography/Title'
 import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
 import axios from 'axios'
+import moment from 'moment'
 
 const Completed = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -27,43 +28,50 @@ const Completed = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'spinBy',
       key: 'name',
       render: (text) => <a>{text}</a>,
     },
     {
       title: 'Reciept No',
-      dataIndex: 'recieptNo',
+      dataIndex: 'receiptNo',
       key: 'recieptNo',
     },
     {
       title: 'Request Date',
       dataIndex: 'createdAt',
       key: 'date',
+      render: (text) => moment(text).format('DD-MMM-YYYY'),
     },
     {
       title: 'Voucher Type',
       key: 'type',
-      dataIndex: 'type',
-      render: (_, { type }) => (
-        <>
-          {type.map((tag) => {
-            let color = tag == 'Amazon' ? 'geekblue' : 'green';
-            if (tag === 'loser') {
-              color = 'volcano';
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
+      dataIndex: 'voucherType',
+       render: (_, { voucherType }) => (  
+    <>
+      {Array.isArray(voucherType) ? (
+        voucherType.map((tag) => {
+          let color = tag === 'Amazon' ? 'geekblue' : 'green';
+          if (tag === 'loser') {
+            color = 'volcano';
+          }
+          return (
+            <Tag color={color} key={tag}>
+              {tag.toUpperCase()}
+            </Tag>
+          );
+        })
+      ) : (
+        <Tag color="gray" key="unknown">
+          Unknown
+        </Tag>
+      )}
+    </>
+  ),
     },
     {
       title: 'Spin Result',
-      dataIndex: 'result',
+      dataIndex: 'spinnerResult',
       key: 'result',
     },
     {
@@ -107,7 +115,7 @@ const Completed = () => {
     <div>
       <Title level={3} className='text-center my-3'>Completed</Title>
       <hr className='my-4' />
-      <Table dataSource={data} columns={columns} />
+      <Table dataSource={request} columns={columns} />
     </div>
   )
 }

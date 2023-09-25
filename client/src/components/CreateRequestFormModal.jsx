@@ -30,9 +30,7 @@ export default function CreateRequestFormModal() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Here, you can handle form submission, e.g., sending data to the server
-    console.log("Bill Number:", billNumber);
-    console.log("Bill Screenshot:", billScreenshot);
-    console.log("Bill Amount:", billAmount);
+
     const formData = {
         receiptNo: billNumber,
         orderPrice: billAmount,

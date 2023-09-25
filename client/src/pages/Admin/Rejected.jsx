@@ -2,6 +2,7 @@ import Title from 'antd/es/typography/Title'
 import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
 import axios from 'axios';
+import moment from 'moment';
 
 const Rejected = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -26,28 +27,30 @@ const Rejected = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'spinBy',
       key: 'name',
       render: (text) => <a>{text}</a>,
     },
     {
       title: 'Reciept No',
-      dataIndex: 'recieptNo',
+      dataIndex: 'receiptNo',
       key: 'recieptNo',
     },
     {
       title: 'Request Date',
       dataIndex: 'createdAt',
       key: 'date',
+      render: (text) => moment(text).format('DD-MMM-YYYY'),
     },
     {
       title: 'Rejected Date',
       key: 'updatedAt',
       dataIndex: 'updatedAt',
+      render: (text) => moment(text).format('DD-MMM-YYYY'),
     },
     {
       title: 'Comment',
-      dataIndex: 'comment',
+      dataIndex: 'remarks',
       key: 'comment',
     },
     {
@@ -91,7 +94,7 @@ const Rejected = () => {
     <div>
       <Title level={3} className='text-center my-3'>Completed</Title>
       <hr className='my-4' />
-      <Table dataSource={data} columns={columns} />
+      <Table dataSource={rejectRequest} columns={columns} />
     </div>
   )
 }

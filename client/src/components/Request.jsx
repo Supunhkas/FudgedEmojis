@@ -2,10 +2,10 @@ import { Button, Typography } from '@mui/material'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const Request = ({ status }) => {
+const Request = ({ id, status }) => {
   const navigate = useNavigate()
-  const handleSpinClick = ()=>{
-    navigate('/spin')
+  const handleSpinClick = (id)=>{
+    navigate(`/spin?id=${id}`); 
   }
   return (
     <div className='text-black p-5 shadow'>
@@ -18,7 +18,7 @@ const Request = ({ status }) => {
       ) : status === 'approved' ? (
         <div className='flex justify-between items-center'>
           <p className='text-green-500'>Approved</p>
-          <Button variant="contained" color='success' onClick={handleSpinClick} style={{
+          <Button variant="contained" color='success' onClick={() =>handleSpinClick(id)} style={{
             borderRadius: '999px',
           }}>Spin Now</Button>
         </div>
