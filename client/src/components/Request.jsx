@@ -3,6 +3,30 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const Request = ({ id, status }) => {
+
+  // const baseUrl = import.meta.env.VITE_BASE_URL;
+  // const accessToken = localStorage.getItem("token");
+
+  // const [waitList, setWaitList] = useState([]);
+  // useEffect(() => {
+  //   const config = {
+  //     headers: {
+  //       Authorization: `Bearer ${accessToken}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   };
+  //   axios
+  //     .get(`${baseUrl}/request/no-spinner`, config)
+  //     .then((res) => {
+  //       setWaitList(res.data);
+  //       console.log(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
+
+
   const navigate = useNavigate()
   const handleSpinClick = (id)=>{
     navigate(`/spin?id=${id}`); 

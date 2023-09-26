@@ -8,7 +8,7 @@ export class CreateRequestDto {
     @IsNotEmpty()
     orderPrice: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     imgUrl: string;
 
     @IsOptional()
@@ -19,4 +19,7 @@ export class CreateRequestDto {
 
     @IsOptional()
     voucherType: string;
+
+    @IsNotEmpty()
+    createdUser: string;
 }

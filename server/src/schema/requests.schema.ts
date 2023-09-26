@@ -36,6 +36,9 @@ export class Request {
  
     @Prop({type: Types.ObjectId, ref: 'User'})
     spinBy: Types.ObjectId;
+
+    @Prop({type: Types.ObjectId, ref: 'User'})
+    createdUser:  Types.ObjectId;
     
 
 }

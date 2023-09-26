@@ -11,12 +11,15 @@ import Completed from './pages/Admin/Completed'
 import Rejected from './pages/Admin/Rejected'
 import SendEmails from './pages/Admin/SendEmails'
 import WaitingForSpin from './pages/Admin/WaitingForSpin'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
 
   return (
     <>
+     <ToastContainer /> 
       <BrowserRouter >
         <Routes>
           <Route path='/login' element={<SignIn />} />

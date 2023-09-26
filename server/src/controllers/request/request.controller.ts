@@ -14,21 +14,30 @@ import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { JwtAuthGuard } from 'src/config/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('request')
 export class RequestController {
-  constructor(private readonly requestService: RequestService) {}
+  constructor(
+    private readonly requestService: RequestService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
-  // @UseGuards(JwtAuthGuard)
+  //  @UseGuards(JwtAuthGuard)
   @Post('add')
-  create(@Body() dto: CreateRequestDto) {
-    return this.requestService.create(dto);
+  @UseInterceptors(FileInterceptor('imgFile'))
+  async create(
+    @Body() dto: CreateRequestDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const result = await this.requestService.create(dto, file);
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('all')
-  findAll() {
-    return this.requestService.findAll();
+  async findAll() {
+    return await this.requestService.findAll();
   }
 
   @Get('request/:id')
@@ -73,17 +82,16 @@ export class RequestController {
       await this.requestService.sendMail(emailData);
       return { message: 'Email sent successfully' };
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return { error: 'Failed to send email' };
     }
   }
 
   // file upload
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadedFile(@UploadedFile() file) {
-    return this.requestService.uploadFile(file);
+  @Post('image')
+  @UseInterceptors(FileInterceptor('imgFile'))
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return this.cloudinaryService.uploadFile(file);
   }
-  
 }

@@ -10,40 +10,54 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request, RequestDocument } from 'src/schema/requests.schema';
 import { Model } from 'mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
-import { createWriteStream, existsSync, mkdirSync } from 'fs';
-import { extname } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class RequestService {
   constructor(
     @InjectModel(Request.name) private requestModel: Model<RequestDocument>,
     private readonly mailService: MailerService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async create(dto: CreateRequestDto) {
+  async create(dto: CreateRequestDto, file: Express.Multer.File) {
+    console.log(dto);
     const existRecipt = await this.requestModel.findOne({
       receiptNo: dto.receiptNo,
     });
 
     if (existRecipt) {
-      throw new ConflictException('Recipt number already exits');
+      throw new ConflictException('Receipt number already exits');
+    }
+
+    let imageUrl = null;
+    console.log(file);
+    if (file) {
+      const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
+      imageUrl = cloudinaryResponse.secure_url;
     }
 
     const requestData = {
       ...dto,
+      imgUrl: imageUrl,
       voucherCode: '',
       remarks: '',
       mailSent: false,
       status: 0,
     };
     const newRequest = new this.requestModel(requestData);
-    return await newRequest.save();
+    await newRequest.save();
+
+    return {
+      statusCode: 201,
+      message: 'Request created successfully',
+      data: newRequest,
+    };
   }
 
   async findAll() {
     const allRequests = await this.requestModel
-      .find({status: 0})
+      .find({ status: 0 })
       .sort({ createdAt: -1 })
       .exec()
       .catch((error) => {
@@ -132,7 +146,8 @@ export class RequestService {
         from: 'fudgedemoji@gmail.com',
         subject: dynamicData.subject,
         template: '../../mails/template.hbs',
-        context: dynamicData,  text: 'welcome',
+        context: dynamicData,
+        text: 'welcome',
         html: '<b>welcome</b>',
       })
       .then((data) => {
@@ -144,30 +159,4 @@ export class RequestService {
   }
 
   //  image upload
-  async uploadFile(file) {
-    if (!file) {
-      throw new Error('No file uploaded.');
-    }
-
-    const uploadPath = '../files';
-
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-
-    const randomName = uuidv4();
-    const extension = extname(file.originalname);
-    const fileName = `${randomName}${extension}`;
-    const filePath = `${uploadPath}/${fileName}`;
-
-    const fileStream = createWriteStream(filePath);
-    fileStream.write(file.buffer);
-
-    const response = {
-      originalname: file.originalname,
-      filename: fileName,
-    };
-
-    return response;
-  }
 }
