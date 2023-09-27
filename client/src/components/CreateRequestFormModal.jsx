@@ -18,7 +18,7 @@ const style = {
   p: 4,
 };
 
-export default function CreateRequestFormModal() {
+export default function CreateRequestFormModal({ onRequestCreated }) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const [billNumber, setBillNumber] = useState("");
@@ -33,12 +33,13 @@ export default function CreateRequestFormModal() {
     e.preventDefault();
     setError(null)
     // Here, you can handle form submission, e.g., sending data to the server
+    const spinBy = localStorage.getItem('name');
 
     const formData = new FormData();
     formData.append("receiptNo", billNumber);
     formData.append("orderPrice", billAmount);
     formData.append("imgFile", billScreenshot);
-    console.log("FormData:", formData);
+    formData.append("spinBy", spinBy);
 
     const config = {
       headers: {
@@ -54,7 +55,7 @@ export default function CreateRequestFormModal() {
  
         if (res.data.statusCode === 201) {
           toast.success("Successfully saved request");
-         
+          onRequestCreated();
           // Reset the form
           setBillNumber("");
           setBillScreenshot(null);

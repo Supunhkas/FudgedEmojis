@@ -92,7 +92,7 @@ const Rejected = () => {
 
   return (
     <div>
-      <Title level={3} className='text-center my-3'>Completed</Title>
+      <Title level={3} className='text-center my-3'>Rejected</Title>
       <hr className='my-4' />
       <Table dataSource={rejectRequest} columns={columns} />
     </div>

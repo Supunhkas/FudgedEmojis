@@ -8,9 +8,10 @@ import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, RequestDocument } from 'src/schema/requests.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdateSpinDto } from './dto/update-sppin.dto';
 
 @Injectable()
 export class RequestService {
@@ -21,29 +22,33 @@ export class RequestService {
   ) {}
 
   async create(dto: CreateRequestDto, file: Express.Multer.File) {
-    console.log(dto);
-    const existRecipt = await this.requestModel.findOne({
+    const existReceipt = await this.requestModel.findOne({
       receiptNo: dto.receiptNo,
     });
 
-    if (existRecipt) {
+    if (existReceipt) {
       throw new ConflictException('Receipt number already exits');
     }
 
     let imageUrl = null;
-    console.log(file);
     if (file) {
       const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
       imageUrl = cloudinaryResponse.secure_url;
     }
+    console.log(dto);
+
+    const { spinBy, ...formData } = dto;
 
     const requestData = {
-      ...dto,
+      ...formData,
       imgUrl: imageUrl,
       voucherCode: '',
       remarks: '',
       mailSent: false,
+      spinnerResult: 0,
+      voucherType: '',
       status: 0,
+      spinBy: spinBy,
     };
     const newRequest = new this.requestModel(requestData);
     await newRequest.save();
@@ -67,6 +72,30 @@ export class RequestService {
     return allRequests;
   }
 
+  // reviewed for spin requests
+  async getAllForSpin() {
+    const query = { status: { $in: [0, 2] } };
+
+    const allForSpin = await this.requestModel.find(query).exec();
+    return allForSpin;
+  }
+
+  // reviewed for spin requests
+  async getAllAcceptedToSpin() {
+    const query = { status: 1 };
+
+    const allReadyForSpin = await this.requestModel.find(query).exec();
+    return allReadyForSpin;
+  }
+
+  // after  spin requests
+  async getAllAfterSpin() {
+    const query = { status: 4 };
+
+    const allAfterSpin = await this.requestModel.find(query).exec();
+    return allAfterSpin;
+  }
+
   async findOne(id: string) {
     const filter = { _id: id };
     const request = await this.requestModel.findOne(filter).exec();
@@ -85,13 +114,39 @@ export class RequestService {
     if (updatedRequest.modifiedCount !== 1) {
       throw new BadRequestException('Update failed!');
     }
-    let target = '';
 
-    updateRequestDto.status === 1
-      ? (target = 'Approved')
-      : (target = 'Rejected');
+    let target;
+    if (updateRequestDto.status === 2) {
+      target = 'Approved';
+    } else if (updateRequestDto.status === 9) {
+      target = 'Rejected';
+    }
 
     return { message: `${target} successfully` };
+  }
+
+  // add spinner value
+  async spinnerResult(id: string, dto: UpdateSpinDto) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+
+    const updatedRequest = await this.requestModel
+      .updateOne(
+        { _id: id },
+        {
+          $set: {
+            spinnerResult: dto.spinnerResult,
+            voucherType: dto.voucherType,
+            status: 4,
+          },
+        },
+      )
+      .exec();
+    console.log(updatedRequest);
+    if (updatedRequest.modifiedCount !== 1) {
+      throw new BadRequestException('Update failed!');
+    }
   }
 
   // request with spinner value
@@ -112,13 +167,13 @@ export class RequestService {
 
   // all completed requests
   async getAllCompletedRequests() {
-    const allCompleted = await this.requestModel.find({ status: 1 }).exec();
+    const allCompleted = await this.requestModel.find({ status: 5 }).exec();
     return allCompleted;
   }
 
   // all rejected requests
   async getAllRejectedRequests() {
-    const allRejected = await this.requestModel.find({ status: 3 }).exec();
+    const allRejected = await this.requestModel.find({ status: 9 }).exec();
     return allRejected;
   }
 

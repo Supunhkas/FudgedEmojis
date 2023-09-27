@@ -2,12 +2,13 @@ import Title from 'antd/es/typography/Title'
 import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
 import axios from 'axios';
+import moment from 'moment';
 
 const NewRequest = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
 
-  const [spinData,setSpinData] = useState([])
+  const [newRequests,setNewRequests] = useState([])
   useEffect(() => {
     const config = {
       headers: {
@@ -16,7 +17,7 @@ const NewRequest = () => {
       },
     };
     axios.get(`${baseUrl}/request/all`, config).then((res) => {
-      setSpinData(res.data)
+      setNewRequests(res.data)
       console.log(res.data)  
     }).catch((err) => {
       console.log(err)
@@ -25,25 +26,26 @@ const NewRequest = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'spinBy',
       key: 'name',
       render: (text) => <a>{text}</a>,
     },
     {
       title: 'Reciept No',
-      dataIndex: 'recieptNo',
-      key: 'recieptNo',
+      dataIndex: 'receiptNo',
+      key: 'receiptNo',
     },
     {
       title: 'Request Date',
       dataIndex: 'createdAt',
       key: 'date',
+      render: (text) => moment  (text).format('DD-MMM-YYYY'),
     },
     {
       title: 'Screenshot',
-      dataIndex: 'screenshot',
+      dataIndex: 'imgUrl',
       key: 'screenshot',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <img src={text} alt="Screenshot" style={{ maxWidth: '50px' }} />,
     },
     {
       title: 'Action',
@@ -56,35 +58,13 @@ const NewRequest = () => {
       ),
     },
   ];
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      recieptNo: 32,
-      createdAt: '19-Sep-2023',
-      screenshot: 'screenshot1.jpg'
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      recieptNo: 42,
-      createdAt: '19-Sep-2023',
-      screenshot: 'screenshot2.jpg'
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      recieptNo: 32,
-      createdAt: '19-Sep-2023',
-      screenshot: 'screenshot3.jpg'
-    },
-  ];
+  
 
   return (
     <div>
       <Title level={3} className='text-center my-3'>Recent Requests</Title>
       <hr className='my-4'/>
-      <Table dataSource={data} columns={columns} />
+      <Table dataSource={newRequests} columns={columns} />
     </div>
   )
 }

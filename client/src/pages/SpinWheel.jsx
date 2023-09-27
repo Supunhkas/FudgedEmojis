@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import TopNavBar from '../components/TopNavBar';
-import WheelComponent from '../components/WheelComponent';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import React, { useState } from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import TopNavBar from "../components/TopNavBar";
+import WheelComponent from "../components/WheelComponent";
+import axios from "axios";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -20,51 +20,37 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3,overflow:"hidden" }}
-        >
-            {children}
-        </Box>
+        <Box sx={{ p: 3, overflow: "hidden" }}>{children}</Box>
       )}
     </div>
   );
 }
 
 function SimpleTabs() {
-  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get("id");
   const [value, setValue] = useState(0);
-  const [chances, setChances] = useState('1');
-  const segments = [
-    "70%",
-    "75%",
-    "80%",
-    "85%",
-    "90%",
-    "95%"
-  ];
-  const segments2 = [
-    "75%",
-    "80%",
-    "85%",
-    "90%",
-    "95%",
-    "100%"
-  ];
+  const [chances, setChances] = useState("1");
+  const segments = ["70%", "75%", "80%", "85%", "90%", "95%"];
+  const segments2 = ["75%", "80%", "85%", "90%", "95%", "100%"];
   const segColors = ["#EE4040", "#F0CF50", "#815CD1", "#3DA5E0", "#34A24F"];
   const onFinished = (winner) => {
-    setChances('0');
-    saveResultToDatabase(winner, 'Amazon'); 
+    setChances("0");
+    saveResultToDatabase(winner, "Amazon");
     console.log(winner);
   };
   const onFinished2 = (winner) => {
-    setChances('0');
-    saveResultToDatabase(winner, 'Shopify');
+    setChances("0");
+    saveResultToDatabase(winner, "Shopify");
     console.log(winner);
   };
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
 
-
   const saveResultToDatabase = (result, selectedTab) => {
+    const parsedResult = parseInt(result, 10);
     const config = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -72,28 +58,31 @@ function SimpleTabs() {
       },
     };
     const data = {
-      result: result,
-      selectedTab: selectedTab,
+      spinnerResult: parsedResult,
+      voucherType: selectedTab,
     };
-  
+
     axios
-    .put(`${baseUrl}/request/update/:${id}`, config,data)
+      .put(`${baseUrl}/request/addresult/${id}`, data, config)
       .then((response) => {
-        console.log('Result saved successfully:', response.data);
+        console.log("Result saved successfully:", response.data);
+        navigate("/");
       })
       .catch((error) => {
-        console.error('Error saving result:', error);
+        console.error("Error saving result:", error);
       });
   };
-  
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   return (
     <>
-    <TopNavBar/>
-      <Typography variant='h6' color={'primary'} textAlign={'center'}>Chances Available {chances}</Typography>
+      <TopNavBar />
+      <Typography variant="h6" color={"primary"} textAlign={"center"}>
+        Chances Available {chances}
+      </Typography>
       <Tabs
         value={value}
         onChange={handleChange}
@@ -105,7 +94,7 @@ function SimpleTabs() {
         <Tab label="Shopify" />
       </Tabs>
       <TabPanel value={value} index={0}>
-      <WheelComponent
+        <WheelComponent
           segments={segments}
           segColors={segColors}
           onFinished={(winner) => onFinished(winner)}
@@ -120,7 +109,7 @@ function SimpleTabs() {
         />
       </TabPanel>
       <TabPanel value={value} index={1}>
-      <WheelComponent
+        <WheelComponent
           segments={segments2}
           segColors={segColors}
           onFinished={(winner) => onFinished2(winner)}
@@ -135,7 +124,6 @@ function SimpleTabs() {
         />
       </TabPanel>
     </>
-
   );
 }
 

@@ -17,7 +17,7 @@ const WaitingForSpin = () => {
       },
     };
     axios
-      .get(`${baseUrl}/request/no-spinner`, config)
+      .get(`${baseUrl}/request/waiting`, config)
       .then((res) => {
         setWaitList(res.data);
         console.log(res.data);

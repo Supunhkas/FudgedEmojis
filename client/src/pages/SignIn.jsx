@@ -16,6 +16,7 @@ import CustomTheme from "../components/CustomTheme";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 
 function Copyright(props) {
@@ -62,6 +63,12 @@ export default function SignIn() {
       if (response.data.statusCode === 200) {
         console.log(response.data);
         localStorage.setItem("token", response.data.token);
+
+        
+      const decodedToken = jwt_decode(response.data.token);
+      const username = decodedToken.name;
+      localStorage.setItem("name", username)
+
 
         navigate("/");
       } else {

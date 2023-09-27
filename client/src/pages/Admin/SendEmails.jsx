@@ -2,12 +2,13 @@ import Title from 'antd/es/typography/Title'
 import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
 import axios from 'axios';
+import moment from 'moment';
 
 const SendEmails = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
 
-  const [spinData,setSpinData] = useState([])
+  const [sendRequest,setSendRequest] = useState([])
   useEffect(() => {
     const config = {
       headers: {
@@ -15,38 +16,40 @@ const SendEmails = () => {
         "Content-Type": "application/json",
       },
     };
-    axios.get(`${baseUrl}/request/spinner`, config).then((res) => {
-      setSpinData(res.data)
+    axios.get(`${baseUrl}/request/after-spin`, config).then((res) => {
+      setSendRequest(res.data)
       console.log(res.data)  
     }).catch((err) => {
-      console.log(err)
+      console.log(err)  
     })
   },[])
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'spinBy',
       key: 'name',
       render: (text) => <a>{text}</a>,
     },
     {
       title: 'Reciept No',
-      dataIndex: 'recieptNo',
+      dataIndex: 'receiptNo',
       key: 'recieptNo',
     },
     {
       title: 'Request Date',
       dataIndex: 'createdAt',
       key: 'date',
+      render: (text) => moment(text).format('DD-MMM-YYYY'),
     },
     {
       title: 'Voucher Type',
       key: 'type',
-      dataIndex: 'type',
-      render: (_, { type }) => (
+      dataIndex: 'voucherType',
+      render: (_, { voucherType }) => (
         <>
-          {type.map((tag) => {
-            let color = tag == 'Amazon' ? 'geekblue' : 'green';
+        {Array.isArray(voucherType) ? (
+          voucherType.map((tag) => {
+            let color = tag === 'Amazon' ? 'geekblue' : 'green';
             if (tag === 'loser') {
               color = 'volcano';
             }
@@ -54,15 +57,19 @@ const SendEmails = () => {
               <Tag color={color} key={tag}>
                 {tag.toUpperCase()}
               </Tag>
-            );
-          })}
-        </>
+            );    
+          })
+        ) : (
+          <Tag>{voucherType}</Tag>
+        )}
+      </>
       ),
     },
     {
       title: 'Spin Result',
-      dataIndex: 'result',
+      dataIndex: 'spinnerResult',
       key: 'result',
+      render: (text) => <span>{text}%</span>,
     },
     {
       title: 'Action',
@@ -105,7 +112,7 @@ const SendEmails = () => {
     <div>
       <Title level={3} className='text-center my-3'>Send Vouchers to the Clients</Title>
       <hr className='my-4'/>
-      <Table dataSource={data} columns={columns} />
+      <Table dataSource={sendRequest} columns={columns} />
     </div>
   )
 }

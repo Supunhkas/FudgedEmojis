@@ -18,6 +18,7 @@ const Completed = () => {
     };
     axios.get(`${baseUrl}/request/completed`, config).then((res) => {
       setRequest(res.data)
+      console.log(res.data)
     }).catch((err) => {
       console.log(err)
     })
@@ -46,33 +47,24 @@ const Completed = () => {
     {
       title: 'Voucher Type',
       key: 'type',
-      dataIndex: 'voucherType',
-       render: (_, { voucherType }) => (  
-    <>
-      {Array.isArray(voucherType) ? (
-        voucherType.map((tag) => {
-          let color = tag === 'Amazon' ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })
-      ) : (
-        <Tag color="gray" key="unknown">
-          Unknown
-        </Tag>
-      )}
-    </>
-  ),
+      dataIndex: 'voucherType', 
+      render: (_, record) => {
+        // Define color based on the record's status
+        const color = record.voucherType === "Amazon" ? 'green' : 'volcano';
+    
+        return (
+          <Tag color={color}>
+            {record.voucherType}
+          </Tag>
+        );
+      },
+  
     },
     {
       title: 'Spin Result',
       dataIndex: 'spinnerResult',
       key: 'result',
+      render: (text) => <span>{text}%</span>,
     },
     {
       title: 'Status',
