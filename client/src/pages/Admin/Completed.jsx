@@ -52,7 +52,7 @@ const Completed = () => {
       key: 'type',
       dataIndex: 'voucherType', 
       render: (_, record) => {
-        // Define color based on the record's status
+    
         const color = record.voucherType === "Amazon" ? 'green' : 'volcano';
     
         return (

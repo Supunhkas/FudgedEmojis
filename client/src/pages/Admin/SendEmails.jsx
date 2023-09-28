@@ -53,25 +53,17 @@ const SendEmails = () => {
       title: "Voucher Type",
       key: "type",
       dataIndex: "voucherType",
-      render: (_, { voucherType }) => (
-        <>
-          {Array.isArray(voucherType) ? (
-            voucherType.map((tag) => {
-              let color = tag === "Amazon" ? "geekblue" : "green";
-              if (tag === "loser") {
-                color = "volcano";
-              }
-              return (
-                <Tag color={color} key={tag}>
-                  {tag.toUpperCase()}
-                </Tag>
-              );
-            })
-          ) : (
-            <Tag>{voucherType}</Tag>
-          )}
-        </>
-      ),
+      render: (_, record) => {
+    
+        const color = record.voucherType === "Amazon" ? 'green' : 'volcano';
+    
+        return (
+          <Tag color={color}>
+            {record.voucherType}
+          </Tag>
+        );
+      },
+     
     },
     {
       title: "Spin Result",
@@ -125,6 +117,26 @@ const SendEmails = () => {
       .then((res) => {
         console.log(res.data)
         toast.success('Email send successfully');  
+        const data = {
+          status: 5,
+          mailSent: true, 
+        }
+        axios
+          .put(`${baseUrl}/request/update/${requestId}`,data, config)
+          .then((res) => {
+            console.log(res.data)
+            setSendRequest((preList) => {
+              const updateList = preList.filter(
+                (item) => item._id !== requestId
+              );
+              return updateList;
+            });
+        
+          })
+          .catch((err) => {
+            console.log(err);
+           
+          });
       })
       .catch((err) => {
         console.log(err);
