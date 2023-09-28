@@ -21,7 +21,7 @@ const WaitingForSpin = () => {
       .get(`${baseUrl}/request/waiting`, config)
       .then((res) => {
         setWaitList(res.data);
-        console.log(res.data);
+     
       })
       .catch((err) => {
         console.log(err);
@@ -43,7 +43,7 @@ const WaitingForSpin = () => {
     axios
       .put(`${baseUrl}/request/update/${requestId}`,data, config)
       .then((res) => {
-        console.log(res.data)
+   
         toast.success('Request rejected successfully');
 
         setWaitList((prevWaitList) => {

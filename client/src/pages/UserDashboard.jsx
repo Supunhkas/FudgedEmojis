@@ -28,7 +28,7 @@ const UserDashboard = () => {
       .get(`${baseUrl}/request/spinning`, config)
       .then((res) => {
         setRequests(res.data);
-        console.log(res.data)  
+        
         setShouldRefresh(false);
       })
       .catch((err) => {
