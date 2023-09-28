@@ -35,7 +35,7 @@ export class RequestService {
       const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
       imageUrl = cloudinaryResponse.secure_url;
     }
-    console.log(dto);
+   
 
     const { spinBy, ...formData } = dto;
 
@@ -49,6 +49,7 @@ export class RequestService {
       voucherType: '',
       status: 0,
       spinBy: spinBy,
+      
     };
     const newRequest = new this.requestModel(requestData);
     await newRequest.save();
@@ -74,7 +75,7 @@ export class RequestService {
 
   // reviewed for spin requests
   async getAllForSpin() {
-    const query = { status: { $in: [0, 2] } };
+    const query = { status: { $in: [0, 1] } };
 
     const allForSpin = await this.requestModel.find(query).exec();
     return allForSpin;
@@ -172,41 +173,4 @@ export class RequestService {
     return allRejected;
   }
 
-  //send mail
-
-  // async sendMail(emailData: any) {
-  //   return  await this.mailService.sendMail({
-  //     to: emailData.to,
-  //     from: emailData.from,
-  //     subject: emailData.subject,
-  //      template: '../../mails/template.hbs',
-  //     context: emailData.context,
-  //   });
-  // }
-  async sendMail(emailData: any) {
-    const dynamicData = {
-      subject: 'Dynamic Email Subject',
-      greeting: 'Hello!',
-      voucherCode: "cbdfgr3",
-      redemptionLink: 'This content is dynamic.',
-    };
-    this.mailService
-      .sendMail({
-        to: 'jayakabaraya@gmail.com',
-        from: 'fudgedemoji@gmail.com',
-        subject: dynamicData.subject,
-        template: '../../mails/template.hbs',
-        context: dynamicData,
-        text: 'welcome',
-        html: '<b>welcome</b>',
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  //  image upload
 }

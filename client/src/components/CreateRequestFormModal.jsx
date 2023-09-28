@@ -34,12 +34,15 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
     setError(null)
     // Here, you can handle form submission, e.g., sending data to the server
     const spinBy = localStorage.getItem('name');
+    const userEmail = localStorage.getItem('userEmail');
+    console.log(userEmail)
 
     const formData = new FormData();
     formData.append("receiptNo", billNumber);
     formData.append("orderPrice", billAmount);
     formData.append("imgFile", billScreenshot);
     formData.append("spinBy", spinBy);
+    formData.append("createdUser", userEmail);
 
     const config = {
       headers: {

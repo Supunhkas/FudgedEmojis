@@ -16,7 +16,7 @@ const Request = ({ id, status, receipt, name, date }) => {
       <p>User Name: {name} </p>
       {status === 0 ? (
         <p className="text-red-500">Under Review</p>
-      ) : status === 2 ? (
+      ) : status === 1 ? (
         <div className="flex justify-between items-center">
           <p className="text-green-500">Approved</p>
           <Button

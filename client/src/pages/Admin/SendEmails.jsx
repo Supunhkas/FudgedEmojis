@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Space, Table, Tag } from "antd";
 import axios from "axios";
 import moment from "moment";
-
+import {toast} from "react-toastify"
 const SendEmails = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
@@ -92,6 +92,7 @@ const SendEmails = () => {
   
 
   const handleSendMail = (id) => {
+
     let requestId = id;
     const config = {
       headers: {
@@ -99,33 +100,38 @@ const SendEmails = () => {
         "Content-Type": "application/json",
       },
     };
-    // const data = {
-    //   status: 5,
-    //   receiptNo: ,
-    //   spinnerResult:,
-    //   voucherType:,
-    //   voucherCode:,
-    //   remarks:
-    // }
-    // axios
-    //   .put(`${baseUrl}/request/update/${requestId}`,data, config)
-    //   .then((res) => {
-    //     console.log(res.data)
-    //     toast.success('Request Approved successfully');
 
-    //     setNewRequests((preList) => {
-    //       const updateList = preList.filter(
-    //         (item) => item._id !== requestId
-    //       );
-    //       return updateList;
-    //     });
-    
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     toast.error('Request not approved ');
-    //   });
+    const selectedRequest = sendRequest.find((item) => item._id === id);
+    if (selectedRequest) {
+      const {
+        receiptNo,
+        spinnerResult,
+        voucherType,
+        voucherCode,
+        remarks,
+        createdUser
+      } = selectedRequest;
+      const data = {
+        to:createdUser ,
+        subject: "Your Voucher Code",
+        receiptNo,
+        spinnerResult,
+        voucherType,
+        voucherCode,
+        remarks,
+      };
+    axios
+      .post(`${baseUrl}/request/email/${requestId}`,data, config)
+      .then((res) => {
+        console.log(res.data)
+        toast.success('Email send successfully');  
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error('Email send failed ');
+      });
   };
+}
 
   return (
     <div>

@@ -16,12 +16,14 @@ import { JwtAuthGuard } from 'src/config/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateSpinDto } from './dto/update-sppin.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Controller('request')
 export class RequestController {
   constructor(
     private readonly requestService: RequestService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly mailService: MailService
   ) {}
 
   //  @UseGuards(JwtAuthGuard)
@@ -98,10 +100,10 @@ export class RequestController {
   }
 
   //email
-  @Post('email')
+  @Post('email/:id')
   async getEmail(@Body() emailData: any) {
     try {
-      await this.requestService.sendMail(emailData);
+      await this.mailService.sendMail(emailData);
       return { message: 'Email sent successfully' };
     } catch (error) {
       console.log(error);

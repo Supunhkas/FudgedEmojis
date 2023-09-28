@@ -5,9 +5,14 @@ import { Mongoose } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Request, RequestSchema } from 'src/schema/requests.schema';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: Request.name, schema: RequestSchema}]), CloudinaryModule],
+  imports: [
+    MongooseModule.forFeature([{ name: Request.name, schema: RequestSchema }]),
+    CloudinaryModule,
+    MailModule,
+  ],
   controllers: [RequestController],
   providers: [RequestService],
 })
