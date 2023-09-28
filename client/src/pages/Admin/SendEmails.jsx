@@ -107,24 +107,24 @@ const SendEmails = () => {
     //   voucherCode:,
     //   remarks:
     // }
-    axios
-      .put(`${baseUrl}/request/update/${requestId}`,data, config)
-      .then((res) => {
-        console.log(res.data)
-        toast.success('Request Approved successfully');
+    // axios
+    //   .put(`${baseUrl}/request/update/${requestId}`,data, config)
+    //   .then((res) => {
+    //     console.log(res.data)
+    //     toast.success('Request Approved successfully');
 
-        setNewRequests((preList) => {
-          const updateList = preList.filter(
-            (item) => item._id !== requestId
-          );
-          return updateList;
-        });
+    //     setNewRequests((preList) => {
+    //       const updateList = preList.filter(
+    //         (item) => item._id !== requestId
+    //       );
+    //       return updateList;
+    //     });
     
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error('Request not approved ');
-      });
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     toast.error('Request not approved ');
+    //   });
   };
 
   return (
