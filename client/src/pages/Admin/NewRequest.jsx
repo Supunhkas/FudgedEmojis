@@ -4,6 +4,7 @@ import { Space, Table, Tag } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
 import { toast } from 'react-toastify';
+import ReviewModal from '../../components/ReviewModel';
 
 const NewRequest = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -29,6 +30,16 @@ const NewRequest = () => {
     ...item,
     key: item._id 
   }));
+
+  const data = {
+    image: 'https://cdn.vox-cdn.com/thumbor/3MEZPjw2g_IvEv-yHOK7WduuapA=/0x0:828x1792/775x1677/filters:focal(414x896:415x897)/cdn.vox-cdn.com/uploads/chorus_asset/file/19357062/ios_screenshot_1.jpeg',
+    name:'John Dev',
+    price:'$200',
+    date: '2020-10-12',
+    result:'85%',
+    voucher: 'Amazon',
+    result: '85%'
+  }
 
   const columns = [
     {
@@ -102,6 +113,8 @@ const NewRequest = () => {
 
   return (
     <div>
+       {/* USE THIS MODAL TO REVIEW AS NEEDED */}
+      <ReviewModal data={data}/>
       <Title level={3} className='text-center my-3'>Recent Requests</Title>
       <hr className='my-4'/>
       <Table dataSource={sendRequestWithKeys} columns={columns} />

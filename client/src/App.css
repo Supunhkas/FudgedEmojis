@@ -1,3 +1,13 @@
 #root{
   width: 100%;
 }
+
+.ant-btn-primary {
+  color: #fff;
+  background-color: #1677ff !important;
+  box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);}
+
+  .ant-btn-dangerous {
+    background-color: #ff4d4f !important;
+    box-shadow: 0 2px 0 rgba(255, 38, 5, 0.06);
+    color: #fff;}

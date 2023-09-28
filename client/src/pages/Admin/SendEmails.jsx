@@ -4,6 +4,7 @@ import { Space, Table, Tag } from "antd";
 import axios from "axios";
 import moment from "moment";
 import {toast} from "react-toastify"
+import SendEmailModal from "../../components/SendEmailModal";
 const SendEmails = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
@@ -152,6 +153,8 @@ const SendEmails = () => {
       </Title>
       <hr className="my-4" />
       <Table dataSource={sendRequestWithKeys} columns={columns} />
+      {/* USE THIS MODAL TO SEND EMAILS AS NEEDED */}
+      <SendEmailModal />
     </div>
   );
 };
