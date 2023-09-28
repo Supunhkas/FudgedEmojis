@@ -1,34 +1,121 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseInterceptors,
+  Put,
+  UseGuards,
+  UploadedFile,
+} from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
+import { JwtAuthGuard } from 'src/config/guards/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdateSpinDto } from './dto/update-sppin.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Controller('request')
 export class RequestController {
-  constructor(private readonly requestService: RequestService) {}
+  constructor(
+    private readonly requestService: RequestService,
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly mailService: MailService
+  ) {}
 
-  @Post()
-  create(@Body() createRequestDto: CreateRequestDto) {
-    return this.requestService.create(createRequestDto);
+  //  @UseGuards(JwtAuthGuard)
+  @Post('add')
+  @UseInterceptors(FileInterceptor('imgFile'))
+  async create(
+    @Body() dto: CreateRequestDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const result = await this.requestService.create(dto, file);
+    return result;
   }
 
-  @Get()
-  findAll() {
-    return this.requestService.findAll();
+  // @UseGuards(JwtAuthGuard)
+  @Get('all')
+  async findAll() {
+    return await this.requestService.findAll();
+  }
+  
+ @Get('spinning')
+  async getAllForSpin(){
+    return await this.requestService.getAllForSpin();
   }
 
-  @Get(':id')
+
+  @Get('waiting')
+  async getAllAcceptedToSpin(){
+    return await this.requestService.getAllAcceptedToSpin();
+  }
+
+  @Get('after-spin')
+  async getAllAfterSpin(){
+    return await this.requestService.getAllAfterSpin();
+  }
+
+  @Get('request/:id')
   findOne(@Param('id') id: string) {
-    return this.requestService.findOne(+id);
+    return this.requestService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto) {
-    return this.requestService.update(+id, updateRequestDto);
+  @Put('update/:id')
+  update(@Param('id') id: string, @Body() dto: UpdateRequestDto) {
+    return this.requestService.update(id, dto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.requestService.remove(+id);
+  @Put('addresult/:id')
+  spinnerResult(@Param('id') id: string, @Body() dto: UpdateSpinDto) {
+    return this.requestService.spinnerResult(id, dto);
+  }
+
+  // @Delete('remove/:id')
+  // remove(@Param('id') id: string) {
+  //   return this.requestService.remove(+id);
+  // }
+
+  @Get('spinner')
+  getAllRequestWithSpinner() {
+    return this.requestService.getAllRequestWithSpinner();
+  }
+
+  @Get('no-spinner')
+  getAllRequestWithoutSpinner() {
+    return this.requestService.getAllRequestWithoutSpinner();
+  }
+
+  @Get('completed')
+  getAllCompletedRequests() {
+    return this.requestService.getAllCompletedRequests();
+  }
+
+  @Get('rejected')
+  getAllRejectedRequests() {
+    return this.requestService.getAllRejectedRequests();
+  }
+
+  //email
+  @Post('email/:id')
+  async getEmail(@Body() emailData: any) {
+    try {
+      await this.mailService.sendMail(emailData);
+      return { message: 'Email sent successfully' };
+    } catch (error) {
+      console.log(error);
+      return { error: 'Failed to send email' };
+    }
+  }
+
+  // file upload
+
+  @Post('image')
+  @UseInterceptors(FileInterceptor('imgFile'))
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return this.cloudinaryService.uploadFile(file);
   }
 }

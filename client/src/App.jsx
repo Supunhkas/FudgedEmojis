@@ -11,17 +11,20 @@ import Completed from './pages/Admin/Completed'
 import Rejected from './pages/Admin/Rejected'
 import SendEmails from './pages/Admin/SendEmails'
 import WaitingForSpin from './pages/Admin/WaitingForSpin'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
 
   return (
     <>
+     <ToastContainer autoClose= {1500} pauseOnFocusLoss={false} pauseOnHover={false}/> 
       <BrowserRouter >
         <Routes>
           <Route path='/login' element={<SignIn />} />
           <Route path='/register' element={<SignUp />} />
-          <Route path='/user' element={<UserDashboard />} />
+          <Route path='/' element={<UserDashboard />} />
           <Route path='/spin' element={<SpinWheel />} />
 
           <Route path='admin' element={<AdminLayout />}>
@@ -30,6 +33,7 @@ function App() {
             <Route path='rejected' element={<Rejected />} />
             <Route path='send' element={<SendEmails />} />
             <Route path='waiting' element={<WaitingForSpin/>}/>
+
 
           </Route>
 
