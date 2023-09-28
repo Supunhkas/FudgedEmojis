@@ -1,46 +1,49 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { UserDocument } from "./auth/user.schema";
-import { Types } from "mongoose";
+    import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+    import { UserDocument } from "./auth/user.schema";
+    import { Types } from "mongoose";
 
-export type RequestDocument = Request & Document;
+    export type RequestDocument = Request & Document;
 
-@Schema({timestamps: true})
+    @Schema({timestamps: true})
 
-export class Request {
-    @Prop()
-    receiptNo: string;
+    export class Request {
+        @Prop()
+        receiptNo: string;
 
-    @Prop()
-    orderPrice: number;
+        @Prop()
+        orderPrice: number;
 
-    @Prop()
-    spinnerResult: number
+        @Prop()
+        spinnerResult: number
 
-    @Prop()
-    imgUrl: string;
+        @Prop()
+        imgUrl: string;
+        
+        @Prop()
+        voucherCode: string;
+
+        @Prop()
+        voucherType: string;
+
+        @Prop()
+        remarks: string;
+
+        @Prop()
+        mailSent: boolean;
+
+        @Prop()
+        status: number;
     
-    @Prop()
-    voucherCode: string;
+        @Prop({type: Types.ObjectId, ref: 'User'})
+        spinBy: Types.ObjectId;
 
-    @Prop()
-    voucherType: string;
+        @Prop({type: Types.ObjectId, ref: 'User'})
+        createdUser:  Types.ObjectId;
 
-    @Prop()
-    remarks: string;
+        @Prop()
+        approvedDate: Date;
+        
 
-    @Prop()
-    mailSent: boolean;
+    }
 
-    @Prop()
-    status: number;
- 
-    @Prop({type: Types.ObjectId, ref: 'User'})
-    spinBy: Types.ObjectId;
-
-    @Prop({type: Types.ObjectId, ref: 'User'})
-    createdUser:  Types.ObjectId;
-    
-
-}
-
-export const RequestSchema = SchemaFactory.createForClass(Request);
+    export const RequestSchema = SchemaFactory.createForClass(Request);

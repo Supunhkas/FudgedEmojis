@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class UpdateRequestDto {
 
@@ -7,5 +7,8 @@ export class UpdateRequestDto {
 
     @IsNotEmpty()
     id: string;
+
+    @IsOptional()
+    approvedDate: Date;
    
 }

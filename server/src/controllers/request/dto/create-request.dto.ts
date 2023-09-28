@@ -22,4 +22,7 @@ export class CreateRequestDto {
 
     @IsNotEmpty()
     createdUser: string;
+
+    @IsOptional()
+    approvedDate: Date;
 }

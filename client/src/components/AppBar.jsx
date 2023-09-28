@@ -32,6 +32,7 @@ const MenuAppBar = ()=> {
   const handleLogOut = ()=>{
     //Handle Log OUt in here
     navigate('/login')
+    localStorage.clear()
   }
 
   return (

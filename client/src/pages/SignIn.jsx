@@ -17,6 +17,7 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
+import {toast} from "react-toastify"
 
 
 function Copyright(props) {
@@ -54,30 +55,31 @@ export default function SignIn() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-
-    try {
-      const response = await axios.post(`${baseUrl}/auth/login`, formData);
-
-      if (response.data.statusCode === 200) {
-        console.log(response.data);
-        localStorage.setItem("token", response.data.token);
-
-        
-      const decodedToken = jwt_decode(response.data.token);
-      const username = decodedToken.name;
-      localStorage.setItem("name", username)
-
-
-        navigate("/");
-      } else {
-        console.error("Login failed");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  
+    axios
+      .post(`${baseUrl}/auth/login`, formData)
+      .then((response) => {
+        if (response.data.statusCode === 200) {
+          localStorage.setItem("token", response.data.token);
+          toast.success('Login Successfully');
+  
+          const decodedToken = jwt_decode(response.data.token);
+          const username = decodedToken.name;
+          localStorage.setItem("name", username);
+  
+          navigate("/");
+        } else {
+          console.error("Login failed");
+          toast.error(response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
+  
   return (
     <ThemeProvider theme={CustomTheme}>
       <Container component="main" maxWidth="xs">
@@ -101,7 +103,7 @@ export default function SignIn() {
             <img
               src={logo}
               alt=""
-              srcset=""
+              srcSet=""
               className="w-full h-full object-contain"
             />
           </Box>

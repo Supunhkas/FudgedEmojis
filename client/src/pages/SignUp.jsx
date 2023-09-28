@@ -89,7 +89,7 @@ export default function SignUp() {
             <img
               src={logo}
               alt=""
-              srcset=""
+              srcSet=""
               className="w-full h-full object-contain"
             />
           </Box>

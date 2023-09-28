@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
+import { toast } from 'react-toastify';
 
 const NewRequest = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -18,11 +19,17 @@ const NewRequest = () => {
     };
     axios.get(`${baseUrl}/request/all`, config).then((res) => {
       setNewRequests(res.data)
-      console.log(res.data)  
+       
     }).catch((err) => {
       console.log(err)
     })
   },[])
+
+  const sendRequestWithKeys = newRequests.map(item => ({
+    ...item,
+    key: item._id 
+  }));
+
   const columns = [
     {
       title: 'Name',
@@ -52,19 +59,52 @@ const NewRequest = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          {/* <a>Invite {record.name}</a> */}
-          <a>Review</a>
+          <a onClick={() => handleReview(record._id)}>Review</a>
         </Space>
       ),
     },
   ];
+
+  const handleReview = (id) => {
+    let requestId = id;
+    const approveDate = new Date();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const data = {
+      status: 1,
+      approvedDate: approveDate.toISOString(),
+    }
+    axios
+      .put(`${baseUrl}/request/update/${requestId}`,data, config)
+      .then((res) => {
+        console.log(res.data)
+        toast.success('Request Approved successfully');
+
+        setNewRequests((preList) => {
+          const updateList = preList.filter(
+            (item) => item._id !== requestId
+          );
+          return updateList;
+        });
+    
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error('Request not approved ');
+      });
+  };
   
 
   return (
     <div>
       <Title level={3} className='text-center my-3'>Recent Requests</Title>
       <hr className='my-4'/>
-      <Table dataSource={newRequests} columns={columns} />
+      <Table dataSource={sendRequestWithKeys} columns={columns} />
     </div>
   )
 }

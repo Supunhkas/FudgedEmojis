@@ -47,23 +47,39 @@ export class AuthService {
       const existUser = await this.userModel.findOne({ email: dto.email });
 
       if (!existUser) {
-        throw new UnauthorizedException('Email not found');
+        return {
+          statusCode: 401,
+          message: 'Email not found',
+        };
       }
 
       if (existUser.password !== dto.password) {
-        throw new UnauthorizedException('Incorrect password');
+        return {
+          statusCode: 401,
+          message: 'Incorrect password',
+        };
       }
+
       const payload: JwtPayload = {
         name: existUser.firstName,
         email: existUser.email,
         _id: existUser._id,
       };
+
       const token = await this.jwtProvider.generateToken(payload);
 
-      return { statusCode: 200, token: token };
+      return {
+        statusCode: 200,
+        message: 'Login successful',
+        token: token,
+      };
     } catch (error) {
       console.error('Login error:', error);
-      throw new UnauthorizedException('Authentication failed');
+
+      return {
+        statusCode: 401,
+        message: 'Authentication failed',
+      };
     }
   }
 
@@ -74,6 +90,4 @@ export class AuthService {
   async findOne(id: string) {
     return await this.userModel.findOne({ _id: id }).select('-password').exec();
   }
-
-
 }

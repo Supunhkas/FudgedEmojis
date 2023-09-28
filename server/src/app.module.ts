@@ -35,16 +35,16 @@ cloudinary.config({
             pass: 'ruiwatofyhkcxvro',
           },
         },
-        // defaults: {
-        //   from: '',
-        // },
-        // template: {
-        //   dir: __dirname + './mails/template.hbs',
-        //   adapter: new HandlebarsAdapter(),
-        //   options: {
-        //     strict: true,
-        //   },
-        // },
+        defaults: {
+          from: 'fudgedemoji@gmail.com',
+        },
+        template: {
+          dir: __dirname + './mails/template.hbs',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
       }),
     }),
     MulterModule.register({

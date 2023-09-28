@@ -11,7 +11,7 @@ import Completed from './pages/Admin/Completed'
 import Rejected from './pages/Admin/Rejected'
 import SendEmails from './pages/Admin/SendEmails'
 import WaitingForSpin from './pages/Admin/WaitingForSpin'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -19,7 +19,7 @@ function App() {
 
   return (
     <>
-     <ToastContainer /> 
+     <ToastContainer autoClose= {1500} pauseOnFocusLoss={false} pauseOnHover={false}/> 
       <BrowserRouter >
         <Routes>
           <Route path='/login' element={<SignIn />} />

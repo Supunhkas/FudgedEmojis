@@ -18,28 +18,32 @@ const Rejected = () => {
     };
     axios.get(`${baseUrl}/request/rejected`, config).then((res) => {
       setRejectRequest(res.data)
-      console.log(res.data)  
     }).catch((err) => {
       console.log(err)
     })
   },[])
 
+  const sendRequestWithKeys = rejectRequest.map(item => ({
+    ...item,
+    key: item._id 
+  }));
+
   const columns = [
     {
       title: 'Name',
       dataIndex: 'spinBy',
-      key: 'name',
+      key: 'spinBy',
       render: (text) => <a>{text}</a>,
     },
     {
       title: 'Reciept No',
       dataIndex: 'receiptNo',
-      key: 'recieptNo',
+      key: 'receiptNo',
     },
     {
       title: 'Request Date',
       dataIndex: 'createdAt',
-      key: 'date',
+      key: 'createdAt',
       render: (text) => moment(text).format('DD-MMM-YYYY'),
     },
     {
@@ -51,7 +55,7 @@ const Rejected = () => {
     {
       title: 'Comment',
       dataIndex: 'remarks',
-      key: 'comment',
+      key: 'remarks',
     },
     {
       title: 'Status',
@@ -94,7 +98,7 @@ const Rejected = () => {
     <div>
       <Title level={3} className='text-center my-3'>Rejected</Title>
       <hr className='my-4' />
-      <Table dataSource={rejectRequest} columns={columns} />
+      <Table dataSource={sendRequestWithKeys} columns={columns} />
     </div>
   )
 }

@@ -107,6 +107,7 @@ export class RequestService {
   }
 
   async update(id: string, updateRequestDto: UpdateRequestDto) {
+    
     const updatedRequest = await this.requestModel
       .updateOne({ _id: id }, { $set: updateRequestDto })
       .exec();
@@ -115,14 +116,8 @@ export class RequestService {
       throw new BadRequestException('Update failed!');
     }
 
-    let target;
-    if (updateRequestDto.status === 2) {
-      target = 'Approved';
-    } else if (updateRequestDto.status === 9) {
-      target = 'Rejected';
-    }
 
-    return { message: `${target} successfully` };
+    return { message: `Request update successfully` };
   }
 
   // add spinner value
@@ -192,8 +187,8 @@ export class RequestService {
     const dynamicData = {
       subject: 'Dynamic Email Subject',
       greeting: 'Hello!',
-      message: 'This is a dynamic email message.',
-      dynamicContent: 'This content is dynamic.',
+      voucherCode: "cbdfgr3",
+      redemptionLink: 'This content is dynamic.',
     };
     this.mailService
       .sendMail({
