@@ -190,7 +190,7 @@ const NewRequest = () => {
         Recent Requests
       </Title>
       <hr className="my-4" />
-      <Table dataSource={sendRequestWithKeys} columns={columns} />
+      <Table dataSource={sendRequestWithKeys} columns={columns} className="overflow-x-auto"/>
     </div>
   );
 };
