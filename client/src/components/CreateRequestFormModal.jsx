@@ -25,12 +25,14 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
   const [billScreenshot, setBillScreenshot] = useState(null);
   const [billAmount, setBillAmount] = useState("");
   const [error, setError] = useState(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setConfirmLoading(true);
     setError(null)
     // Here, you can handle form submission, e.g., sending data to the server
     const spinBy = localStorage.getItem('name');
@@ -57,6 +59,7 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
       .then((res) => {
  
         if (res.data.statusCode === 201) {
+          setConfirmLoading(false)
           toast.success("Successfully saved request");
           onRequestCreated();
           // Reset the form
@@ -150,9 +153,9 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
               required
             />
             <div className="flex justify-between items-center">
-              <Button type="submit" variant="contained" color="primary">
+              <Button type="submit" variant="contained" color="primary" disabled={confirmLoading}>
                 {" "}
-                Submit
+                {confirmLoading ? 'Uploading' : 'Submit'}
               </Button>
               <Button onClick={handleClose} variant="contained" color="error">
                 {" "}
