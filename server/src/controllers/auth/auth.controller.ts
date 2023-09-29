@@ -19,6 +19,7 @@ import { Request, Response } from 'express';
 import { AdminLoginDto } from './dto/admin.dto';
 import { AdminRegisterDto } from './dto/adminRegister.dto';
 
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -67,4 +68,7 @@ export class AuthController {
   findOne(@Param('id') id: string) {
     return this.authService.findOne(id);
   }
+
+ 
+
 }

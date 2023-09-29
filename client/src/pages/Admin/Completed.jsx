@@ -53,7 +53,7 @@ const Completed = () => {
       dataIndex: 'voucherType', 
       render: (_, record) => {
     
-        const color = record.voucherType === "Amazon" ? 'green' : 'volcano';
+        const color = record.voucherType === "Amazon" ? 'green' : 'geekblue';
     
         return (
           <Tag color={color}>
