@@ -11,12 +11,6 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { MailModule } from './mail/mail.module';
 import { MailService } from './mail/mail.service';
           
-cloudinary.config({ 
-  cloud_name: 'dpjw4jihq', 
-  api_key: '557773761185323', 
-  api_secret: 'fiz-nYpxaj3RYwuFVDF24kmVFpM' 
-});
-
 @Module({
   imports: [
     AuthModule,

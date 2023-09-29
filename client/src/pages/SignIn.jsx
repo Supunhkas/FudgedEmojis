@@ -61,9 +61,9 @@ export default function SignIn() {
     axios
       .post(`${baseUrl}/auth/login`, formData)
       .then((response) => {
-        if (response.data.statusCode === 200) {
+        if (response) {
           localStorage.setItem("token", response.data.token);
-          toast.success('Login Successfully');
+          toast.success(response.data.message);
   
           const decodedToken = jwt_decode(response.data.token);
           const username = decodedToken.name;
@@ -72,13 +72,12 @@ export default function SignIn() {
           localStorage.setItem('userEmail', email)
   
           navigate("/");
-        } else {
-          console.error("Login failed");
-          toast.error(response.data.message);
-        }
+        } 
       })
       .catch((error) => {
-        console.error("Error:", error);
+        
+        toast.error(error.response.data.message);
+        console.log("Error:", error);
       });
   };
   
