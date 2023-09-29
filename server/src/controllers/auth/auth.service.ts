@@ -10,11 +10,16 @@ import { User, UserDocument } from 'src/schema/auth/user.schema';
 import { Model } from 'mongoose';
 import { JwtPayload } from './jwt/jwt.payload';
 import { JwtProvider } from './jwt/jwt.provider';
+import { UserRole } from '../../config/guards/roles.enum';
+import { AdminLoginDto } from './dto/admin.dto';
+import { Admin, AdminDocument } from 'src/schema/auth/admin.schema';
+import { AdminRegisterDto } from './dto/adminRegister.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(Admin.name) private readonly adminModel: Model<AdminDocument>,
     private readonly jwtProvider: JwtProvider,
   ) {}
 
@@ -39,12 +44,68 @@ export class AuthService {
     }
 
     const newUser = new this.userModel(dto);
+    newUser.role = UserRole.USER;
     return await newUser.save();
+  }
+
+  async createAdmin(dto: AdminRegisterDto) {
+    const existAdmin = await this.adminModel.findOne({ email: dto.email });
+    if (existAdmin !== null) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const newAdmin = new this.adminModel(dto);
+    newAdmin.role = UserRole.ADMIN;
+    return await newAdmin.save();
   }
 
   async login(dto: LoginDto) {
     try {
-      const existUser = await this.userModel.findOne({ email: dto.email });
+        const existUser = await this.userModel.findOne({ email: dto.email });
+
+        if (!existUser) {
+          return {
+            statusCode: 401,
+            message: 'Email not found',
+          };
+        }
+
+        if (existUser.password !== dto.password) {
+          return {
+            statusCode: 401,
+            message: 'Incorrect password',
+          };
+        }
+
+        const payload: JwtPayload = {
+          name: existUser.firstName,
+          email: existUser.email,
+          _id: existUser._id,
+          role: existUser.role,
+        };
+
+      const token = await this.jwtProvider.generateToken(payload);
+
+      return {
+        statusCode: 200,
+        message: 'Login successful',
+        token: token,
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+
+      return {
+        statusCode: 401,
+        message: 'Authentication failed',
+      };
+    }
+  }
+
+  // admin login 
+ async adminLogin(dto: AdminLoginDto) {
+  try {
+    // Add logic to check if the user with the provided credentials is an admin
+    const existUser = await this.adminModel.findOne({ email: dto.email });
 
       if (!existUser) {
         return {
@@ -64,24 +125,25 @@ export class AuthService {
         name: existUser.firstName,
         email: existUser.email,
         _id: existUser._id,
+        role: existUser.role,
       };
 
-      const token = await this.jwtProvider.generateToken(payload);
+    const token = await this.jwtProvider.generateToken(payload);
 
-      return {
-        statusCode: 200,
-        message: 'Login successful',
-        token: token,
-      };
-    } catch (error) {
-      console.error('Login error:', error);
+    return {
+      statusCode: 200,
+      message: 'Admin login successful',
+      token: token,
+    };
+  } catch (error) {
+    console.error('Admin login error:', error);
 
-      return {
-        statusCode: 401,
-        message: 'Authentication failed',
-      };
-    }
+    return {
+      statusCode: 401,
+      message: 'Authentication failed',
+    };
   }
+ }
 
   async findAll() {
     return await this.userModel.find().select('-password').exec();

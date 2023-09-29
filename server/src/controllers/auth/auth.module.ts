@@ -7,13 +7,15 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtProvider } from './jwt/jwt.provider';
 import { JwtStrategy } from './jwt/jwt.strategy';
+import { Admin, AdminSchema } from 'src/schema/auth/admin.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'sgg45',
+      secret: 'D9ik7Nw3xh',
       signOptions: { expiresIn: '24h' },
     }),
   ],

@@ -17,6 +17,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateSpinDto } from './dto/update-sppin.dto';
 import { MailService } from 'src/mail/mail.service';
+import { RolesGuard } from 'src/config/guards/role.guard';
+import { Roles } from 'src/config/guards/roles.decorator';
+import { UserRole } from 'src/config/guards/roles.enum';
 
 @Controller('request')
 export class RequestController {
@@ -26,7 +29,7 @@ export class RequestController {
     private readonly mailService: MailService
   ) {}
 
-  //  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('add')
   @UseInterceptors(FileInterceptor('imgFile'))
   async create(
@@ -43,32 +46,37 @@ export class RequestController {
     return await this.requestService.findAll();
   }
   
+  // @UseGuards(JwtAuthGuard)
  @Get('spinning')
   async getAllForSpin(){
     return await this.requestService.getAllForSpin();
   }
 
-
+  // @UseGuards(JwtAuthGuard)
   @Get('waiting')
   async getAllAcceptedToSpin(){
     return await this.requestService.getAllAcceptedToSpin();
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Get('after-spin')
   async getAllAfterSpin(){
     return await this.requestService.getAllAfterSpin();
   }
 
-  @Get('request/:id')
+  // @UseGuards(JwtAuthGuard)
+  @Get('getOne/:id')
   findOne(@Param('id') id: string) {
     return this.requestService.findOne(id);
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Put('update/:id')
   update(@Param('id') id: string, @Body() dto: UpdateRequestDto) {
     return this.requestService.update(id, dto);
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Put('addresult/:id')
   spinnerResult(@Param('id') id: string, @Body() dto: UpdateSpinDto) {
     return this.requestService.spinnerResult(id, dto);
@@ -78,41 +86,46 @@ export class RequestController {
   // remove(@Param('id') id: string) {
   //   return this.requestService.remove(+id);
   // }
-
+  @UseGuards(JwtAuthGuard)
   @Get('spinner')
   getAllRequestWithSpinner() {
     return this.requestService.getAllRequestWithSpinner();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('no-spinner')
   getAllRequestWithoutSpinner() {
     return this.requestService.getAllRequestWithoutSpinner();
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Get('completed')
   getAllCompletedRequests() {
     return this.requestService.getAllCompletedRequests();
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Get('rejected')
   getAllRejectedRequests() {
     return this.requestService.getAllRejectedRequests();
   }
 
   //email
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('email/:id')
   async getEmail(@Body() emailData: any) {
     try {
       await this.mailService.sendMail(emailData);
       return { message: 'Email sent successfully' };
     } catch (error) {
-      console.log(error);
+
       return { error: 'Failed to send email' };
     }
   }
 
   // file upload
-
+  @UseGuards(JwtAuthGuard)
   @Post('image')
   @UseInterceptors(FileInterceptor('imgFile'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {

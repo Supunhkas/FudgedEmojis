@@ -3,13 +3,16 @@ import React, { useEffect, useState } from "react";
 import { Space, Table, Tag } from "antd";
 import axios from "axios";
 import moment from "moment";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 import SendEmailModal from "../../components/SendEmailModal";
 const SendEmails = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
 
   const [sendRequest, setSendRequest] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [voucherCode, setVoucherCode] = useState("");
   useEffect(() => {
     const config = {
       headers: {
@@ -55,16 +58,10 @@ const SendEmails = () => {
       key: "type",
       dataIndex: "voucherType",
       render: (_, record) => {
-    
-        const color = record.voucherType === "Amazon" ? 'green' : 'volcano';
-    
-        return (
-          <Tag color={color}>
-            {record.voucherType}
-          </Tag>
-        );
+        const color = record.voucherType === "Amazon" ? "green" : "volcano";
+
+        return <Tag color={color}>{record.voucherType}</Tag>;
       },
-     
     },
     {
       title: "Spin Result",
@@ -77,15 +74,24 @@ const SendEmails = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <a onClick={() => handleSendMail(record._id)}> Send email </a>
+          <a onClick={() => handleReview(record._id)}> Send email </a>
         </Space>
       ),
     },
   ];
-  
 
-  const handleSendMail = (id) => {
+  const handleCancel = () => {
+    setSelectedRequestId(null);
+    setIsModalVisible(false);
+  };
 
+  const handleReview = (id) => {
+    setSelectedRequestId(id);
+    setIsModalVisible(true);
+  };
+
+  const handleSendMail = (id, voucherCode) => {
+    setSelectedRequestId(id);
     let requestId = id;
     const config = {
       headers: {
@@ -96,16 +102,10 @@ const SendEmails = () => {
 
     const selectedRequest = sendRequest.find((item) => item._id === id);
     if (selectedRequest) {
-      const {
-        receiptNo,
-        spinnerResult,
-        voucherType,
-        voucherCode,
-        remarks,
-        createdUser
-      } = selectedRequest;
+      const { receiptNo, spinnerResult, voucherType, remarks, createdUser } =
+        selectedRequest;
       const data = {
-        to:createdUser ,
+        to: createdUser,
         subject: "Your Voucher Code",
         receiptNo,
         spinnerResult,
@@ -113,38 +113,39 @@ const SendEmails = () => {
         voucherCode,
         remarks,
       };
-    axios
-      .post(`${baseUrl}/request/email/${requestId}`,data, config)
-      .then((res) => {
-        console.log(res.data)
-        toast.success('Email send successfully');  
-        const data = {
-          status: 5,
-          mailSent: true, 
-        }
-        axios
-          .put(`${baseUrl}/request/update/${requestId}`,data, config)
-          .then((res) => {
-            console.log(res.data)
-            setSendRequest((preList) => {
-              const updateList = preList.filter(
-                (item) => item._id !== requestId
-              );
-              return updateList;
+      axios
+        .post(`${baseUrl}/request/email/${requestId}`, data, config)
+        .then((res) => {
+         
+          toast.success("Email send successfully");
+          const data = {
+            status: 5,
+            mailSent: true,
+          };
+          axios
+            .put(`${baseUrl}/request/update/${requestId}`, data, config)
+            .then((res) => {
+              setSendRequest((preList) => {
+                const updateList = preList.filter(
+                  (item) => item._id !== requestId
+                );
+                return updateList;
+              });
+            })
+
+            .catch((err) => {
+              console.log(err);
             });
-        
-          })
-          .catch((err) => {
-            console.log(err);
-           
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error('Email send failed ');
-      });
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Email sent failed");
+        })
+        .finally(() => {
+          setIsModalVisible(false);
+        });
+    }
   };
-}
 
   return (
     <div>
@@ -152,9 +153,18 @@ const SendEmails = () => {
         Send Vouchers to the Clients
       </Title>
       <hr className="my-4" />
-      <Table dataSource={sendRequestWithKeys} columns={columns} />
+      <Table dataSource={sendRequestWithKeys} columns={columns} className="overflow-x-auto"/>
       {/* USE THIS MODAL TO SEND EMAILS AS NEEDED */}
-      <SendEmailModal />
+
+      {isModalVisible && (
+        <SendEmailModal
+          visible={isModalVisible}
+          onCancel={handleCancel}
+          onOk={(voucherCode) => handleSendMail(selectedRequestId, voucherCode)}
+          voucherCode={voucherCode}
+          setVoucherCode={setVoucherCode}
+        />
+      )}
     </div>
   );
 };

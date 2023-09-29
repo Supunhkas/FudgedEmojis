@@ -39,12 +39,12 @@ function SimpleTabs() {
   const onFinished = (winner) => {
     setChances("0");
     saveResultToDatabase(winner, "Amazon");
-    console.log(winner);
+   
   };
   const onFinished2 = (winner) => {
     setChances("0");
     saveResultToDatabase(winner, "Shopify");
-    console.log(winner);
+    
   };
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
@@ -65,7 +65,7 @@ function SimpleTabs() {
     axios
       .put(`${baseUrl}/request/addresult/${id}`, data, config)
       .then((response) => {
-        console.log("Result saved successfully:", response.data);
+       
         navigate("/");
       })
       .catch((error) => {
