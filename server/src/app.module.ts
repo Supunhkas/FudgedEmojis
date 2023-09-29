@@ -27,6 +27,7 @@ cloudinary.config({
     MulterModule.register({}),
     CloudinaryModule,
     MailModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService,MailService],

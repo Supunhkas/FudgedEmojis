@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
@@ -61,51 +63,7 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     try {
-        const existUser = await this.userModel.findOne({ email: dto.email });
-
-        if (!existUser) {
-          return {
-            statusCode: 401,
-            message: 'Email not found',
-          };
-        }
-
-        if (existUser.password !== dto.password) {
-          return {
-            statusCode: 401,
-            message: 'Incorrect password',
-          };
-        }
-
-        const payload: JwtPayload = {
-          name: existUser.firstName,
-          email: existUser.email,
-          _id: existUser._id,
-          role: existUser.role,
-        };
-
-      const token = await this.jwtProvider.generateToken(payload);
-
-      return {
-        statusCode: 200,
-        message: 'Login successful',
-        token: token,
-      };
-    } catch (error) {
-      console.error('Login error:', error);
-
-      return {
-        statusCode: 401,
-        message: 'Authentication failed',
-      };
-    }
-  }
-
-  // admin login 
- async adminLogin(dto: AdminLoginDto) {
-  try {
-    // Add logic to check if the user with the provided credentials is an admin
-    const existUser = await this.adminModel.findOne({ email: dto.email });
+      const existUser = await this.userModel.findOne({ email: dto.email });
 
       if (!existUser) {
         return {
@@ -128,22 +86,66 @@ export class AuthService {
         role: existUser.role,
       };
 
-    const token = await this.jwtProvider.generateToken(payload);
+      const token = await this.jwtProvider.generateToken(payload);
 
-    return {
-      statusCode: 200,
-      message: 'Admin login successful',
-      token: token,
-    };
-  } catch (error) {
-    console.error('Admin login error:', error);
+      return {
+        statusCode: 200,
+        message: 'Login successful',
+        token: token,
+      };
+    } catch (error) {
+      console.error('Login error:', error);
 
-    return {
-      statusCode: 401,
-      message: 'Authentication failed',
-    };
+      return {
+        statusCode: 401,
+        message: 'Authentication failed',
+      };
+    }
   }
- }
+
+  // admin login
+  async adminLogin(dto: AdminLoginDto) {
+    try {
+      // Add logic to check if the user with the provided credentials is an admin
+      const existUser = await this.adminModel.findOne({ email: dto.email });
+
+      if (!existUser) {
+        return {
+          statusCode: 401,
+          message: 'Email not found',
+        };
+      }
+
+      if (existUser.password !== dto.password) {
+        return {
+          statusCode: 401,
+          message: 'Incorrect password',
+        };
+      }
+
+      const payload: JwtPayload = {
+        name: existUser.firstName,
+        email: existUser.email,
+        _id: existUser._id,
+        role: existUser.role,
+      };
+
+      const token = await this.jwtProvider.generateToken(payload);
+
+      return {
+        statusCode: 200,
+        message: 'Admin login successful',
+        token: token,
+      };
+    } catch (error) {
+      console.error('Admin login error:', error);
+
+      return {
+        statusCode: 401,
+        message: 'Authentication failed',
+      };
+    }
+  }
 
   async findAll() {
     return await this.userModel.find().select('-password').exec();

@@ -17,7 +17,6 @@ import { UpdateSpinDto } from './dto/update-sppin.dto';
 export class RequestService {
   constructor(
     @InjectModel(Request.name) private requestModel: Model<RequestDocument>,
-    private readonly mailService: MailerService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 

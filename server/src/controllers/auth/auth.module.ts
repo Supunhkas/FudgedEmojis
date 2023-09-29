@@ -9,6 +9,7 @@ import { JwtProvider } from './jwt/jwt.provider';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { Admin, AdminSchema } from 'src/schema/auth/admin.schema';
 
+
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -18,6 +19,7 @@ import { Admin, AdminSchema } from 'src/schema/auth/admin.schema';
       secret: 'D9ik7Nw3xh',
       signOptions: { expiresIn: '24h' },
     }),
+    
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtProvider, JwtStrategy],

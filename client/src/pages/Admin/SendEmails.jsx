@@ -5,6 +5,7 @@ import axios from "axios";
 import moment from "moment";
 import { toast } from "react-toastify";
 import SendEmailModal from "../../components/SendEmailModal";
+import ReviewModal from "../../components/ReviewModel";
 const SendEmails = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const accessToken = localStorage.getItem("token");
@@ -13,6 +14,9 @@ const SendEmails = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [voucherCode, setVoucherCode] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRequestData, setSelectedRequestData] = useState(null);
+
   useEffect(() => {
     const config = {
       headers: {
@@ -58,7 +62,7 @@ const SendEmails = () => {
       key: "type",
       dataIndex: "voucherType",
       render: (_, record) => {
-        const color = record.voucherType === "Amazon" ? "green" : "volcano";
+        const color = record.voucherType === "Amazon" ? "green" : "geekblue";
 
         return <Tag color={color}>{record.voucherType}</Tag>;
       },
@@ -74,7 +78,8 @@ const SendEmails = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <a onClick={() => handleReview(record._id)}> Send email </a>
+          <a onClick={() => handleReview(record._id)}> Review </a>
+          <a onClick={() => handleSend(record._id)}> Send email </a>
         </Space>
       ),
     },
@@ -85,9 +90,76 @@ const SendEmails = () => {
     setIsModalVisible(false);
   };
 
-  const handleReview = (id) => {
+  const handleSend = (id) => {
     setSelectedRequestId(id);
     setIsModalVisible(true);
+  };
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleReview = (id) => {
+    setSelectedRequestId(id);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    };
+    axios
+      .get(`${baseUrl}/request/getOne/${id}`, config)
+      .then((res) => {
+        setSelectedRequestData(res.data);
+        console.log(res.data);
+        showModal();
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        showModal();
+      });
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+    setIsModalVisible(true);
+  };
+  const handleReject = (id) => {
+    const requestId = id;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const data = {
+      status: 9,
+    };
+    axios
+      .put(`${baseUrl}/request/update/${requestId}`, data, config)
+      .then((res) => {
+        toast.success("Request rejected successfully");
+
+        setSendRequest((prevRequest) => {
+          const updatedReqList = prevRequest.filter(
+            (item) => item._id !== requestId
+          );
+          return updatedReqList;
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Request not rejected ");
+      })
+      .finally(() => {
+        setIsModalOpen(false);
+      });
   };
 
   const handleSendMail = (id, voucherCode) => {
@@ -117,7 +189,6 @@ const SendEmails = () => {
         .post(`${baseUrl}/request/email/${requestId}`, data, config)
         .then((res) => {
          
-          toast.success("Email send successfully");
           const data = {
             status: 5,
             mailSent: true,
@@ -125,6 +196,7 @@ const SendEmails = () => {
           axios
             .put(`${baseUrl}/request/update/${requestId}`, data, config)
             .then((res) => {
+              toast.success("Email send successfully");
               setSendRequest((preList) => {
                 const updateList = preList.filter(
                   (item) => item._id !== requestId
@@ -163,6 +235,15 @@ const SendEmails = () => {
           onOk={(voucherCode) => handleSendMail(selectedRequestId, voucherCode)}
           voucherCode={voucherCode}
           setVoucherCode={setVoucherCode}
+        />
+      )}
+      {isModalOpen && (
+        <ReviewModal
+          data={selectedRequestData}
+          isOpen={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleModalCancel}
+          onReject={handleReject}
         />
       )}
     </div>

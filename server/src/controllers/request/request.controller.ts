@@ -112,15 +112,16 @@ export class RequestController {
 
   //email
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   @Post('email/:id')
   async getEmail(@Body() emailData: any) {
     try {
       await this.mailService.sendMail(emailData);
       return { message: 'Email sent successfully' };
+
     } catch (error) {
 
-      return { error: 'Failed to send email' };
+      return { error: error.message || 'Failed to send email' };
     }
   }
 
