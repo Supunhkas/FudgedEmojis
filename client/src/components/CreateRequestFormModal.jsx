@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { TextField } from "@mui/material";
 import axios from "axios";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const style = {
   color: "black",
@@ -33,11 +33,11 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setConfirmLoading(true);
-    setError(null)
+    setError(null);
     // Here, you can handle form submission, e.g., sending data to the server
-    const spinBy = localStorage.getItem('name');
-    const userEmail = localStorage.getItem('userEmail');
-    console.log(userEmail)
+    const spinBy = localStorage.getItem("name");
+    const userEmail = localStorage.getItem("userEmail");
+    console.log(userEmail);
 
     const formData = new FormData();
     formData.append("receiptNo", billNumber);
@@ -53,12 +53,12 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
       },
     };
 
-
     axios
       .post(`${baseUrl}/request/add`, formData, config)
       .then((res) => {
-        if (res.data && res.data.message === "Request created successfully") {
-          setConfirmLoading(false);
+        setConfirmLoading(false);
+
+        if (res.status === 200) {
           toast.success("Successfully saved request");
           onRequestCreated();
           // Reset the form
@@ -67,7 +67,6 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
           setBillAmount("");
           handleClose();
         } else {
-          setConfirmLoading(false);
           console.error("Error:", res.data);
           setError("An error occurred while saving the request.");
         }
@@ -75,18 +74,18 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
       .catch((error) => {
         setConfirmLoading(false);
         console.error(error);
-        toast.error(" Request created failed ");
+        toast.error("Request created failed");
         setError("An error occurred while saving the request.");
       });
   };
 
-  const handleBillNumberChange = (e) => { 
+  const handleBillNumberChange = (e) => {
     setBillNumber(e.target.value);
   };
 
   const handleBillScreenshotChange = (e) => {
     const file = e.target.files[0];
-    console.log(file)
+    console.log(file);
     setBillScreenshot(file);
   };
 
@@ -96,7 +95,7 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
   const handleClose = () => {
     console.log("Closing modal");
     setOpen(false);
-    setError(null); 
+    setError(null);
   };
 
   return (
@@ -123,7 +122,7 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Submit Your Bill Details
           </Typography>
-           {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <form onSubmit={handleSubmit} encType="multipart/form-data">
             <TextField
               label="Bill Number"
@@ -159,9 +158,14 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
               required
             />
             <div className="flex justify-between items-center">
-              <Button type="submit" variant="contained" color="primary" disabled={confirmLoading}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={confirmLoading}
+              >
                 {" "}
-                {confirmLoading ? 'Uploading' : 'Submit'}
+                {confirmLoading ? "Uploading" : "Submit"}
               </Button>
               <Button onClick={handleClose} variant="contained" color="error">
                 {" "}

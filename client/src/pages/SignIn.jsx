@@ -69,8 +69,11 @@ export default function SignIn() {
           const decodedToken = jwt_decode(response.data.token);
           const username = decodedToken.name;
           const email = decodedToken.email;
+          const userId = decodedToken._id;
           localStorage.setItem("name", username);
           localStorage.setItem("userEmail", email);
+          localStorage.setItem("userId", userId);
+
 
           navigate("/");
         }

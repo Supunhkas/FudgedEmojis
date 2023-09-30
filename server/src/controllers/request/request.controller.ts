@@ -8,6 +8,8 @@ import {
   Put,
   UseGuards,
   UploadedFile,
+  Request,
+  Query,
 } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
@@ -48,9 +50,9 @@ export class RequestController {
   
   @UseGuards(JwtAuthGuard)
  @Get('spinning')
-  async getAllForSpin(){
-    return await this.requestService.getAllForSpin();
-  }
+ async getAllForSpin(@Query('email') email: string) {
+  return this.requestService.getAllForSpin(email);
+}
 
   @UseGuards(JwtAuthGuard)
   @Get('waiting')
