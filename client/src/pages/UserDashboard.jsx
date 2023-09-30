@@ -18,6 +18,8 @@ const UserDashboard = () => {
 
   const [requests, setRequests] = useState([]);
   useEffect(() => {
+    const email = localStorage.getItem('userEmail')
+   console.log(email) 
     const config = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -25,7 +27,7 @@ const UserDashboard = () => {
       },
     };
     axios
-      .get(`${baseUrl}/request/spinning`, config)
+      .get(`${baseUrl}/request/spinning?email=${email}`, config)
       .then((res) => {
         setRequests(res.data);
         

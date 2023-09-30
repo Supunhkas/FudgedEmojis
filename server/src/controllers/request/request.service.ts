@@ -67,10 +67,14 @@ export class RequestService {
   }
 
   // reviewed for spin requests
-  async getAllForSpin() {
-    const query = { status: { $in: [0, 1] } };
-
+  async getAllForSpin(email: string) {
+    const query: any = { status: { $in: [0, 1] } };
+    if (email) {
+      query.createdUser  = email;
+    }
+    
     const allForSpin = await this.requestModel.find(query).exec();
+   
     return allForSpin;
   }
 
