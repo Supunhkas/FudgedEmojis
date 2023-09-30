@@ -41,36 +41,47 @@ export class AuthService {
   }
 
   async create(dto: RegisterDto) {
+    const role = dto.role || UserRole.USER;
+
     const existUser = await this.userModel.findOne({ email: dto.email });
     if (existUser !== null) {
       throw new ConflictException('Email already exists');
     }
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const newUser = new this.userModel({ ...dto, role: UserRole.USER, password: hashedPassword });
-    
+    const newUser = new this.userModel({
+      ...dto,
+      role: role,
+      password: hashedPassword,
+    });
+
     return await newUser.save();
   }
 
   async createAdmin(dto: AdminRegisterDto) {
-    const existAdmin = await this.adminModel.findOne({ email: dto.email });
+    const existAdmin = await this.userModel.findOne({ email: dto.email });
     if (existAdmin !== null) {
       throw new ConflictException('Email already exists');
     }
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const newAdmin = new this.adminModel({ ...dto, role: UserRole.ADMIN, password: hashedPassword });
+    const newAdmin = new this.userModel({
+      ...dto,
+      role: UserRole.ADMIN,
+      password: hashedPassword,
+    });
 
     return await newAdmin.save();
   }
 
   async login(dto: LoginDto) {
     try {
-      const existUser = await this.userModel.findOne({ email: dto.email });
+      const { email, password, role } = dto;
+      const existUser = await this.userModel.findOne({ email, role });
 
       if (!existUser) {
         throw new ConflictException('Email not found');
       }
 
-      const passwordMatch = await bcrypt.compare(dto.password, existUser.password);
+      const passwordMatch = await bcrypt.compare(password, existUser.password);
 
       if (!passwordMatch) {
         throw new ConflictException('Incorrect password');
@@ -99,19 +110,21 @@ export class AuthService {
   // admin login
   async adminLogin(dto: AdminLoginDto) {
     try {
-
-      const existAdmin = await this.adminModel.findOne({ email: dto.email });
+      const existAdmin = await this.userModel.findOne({ email: dto.email });
 
       if (!existAdmin) {
         throw new ConflictException('Email not found');
       }
 
-      const passwordMatch = await bcrypt.compare(dto.password, existAdmin.password);
+      const passwordMatch = await bcrypt.compare(
+        dto.password,
+        existAdmin.password,
+      );
 
       if (!passwordMatch) {
         throw new ConflictException('Incorrect password');
       }
-  
+
       const payload: JwtPayload = {
         name: existAdmin.firstName,
         email: existAdmin.email,
@@ -128,7 +141,7 @@ export class AuthService {
     } catch (error) {
       console.error('Admin login error:', error);
 
-     throw error;
+      throw error;
     }
   }
 

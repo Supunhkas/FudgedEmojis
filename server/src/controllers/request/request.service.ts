@@ -9,7 +9,6 @@ import { UpdateRequestDto } from './dto/update-request.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, RequestDocument } from 'src/schema/requests.schema';
 import { Model, Types } from 'mongoose';
-import { MailerService } from '@nestjs-modules/mailer';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateSpinDto } from './dto/update-sppin.dto';
 
@@ -49,22 +48,21 @@ export class RequestService {
       spinBy: spinBy,
     };
     const newRequest = new this.requestModel(requestData);
-   const createdUser =  await newRequest.save();
+    const createdRequest = await newRequest.save();
 
-   if(!createdUser){
-    throw new Error("User not Created")
-   }
+    if (!createdRequest) {
+      throw new Error('Request not Created');
+    }
 
-   return {message: "User Created Successfully"};
-    
+    return { message: 'Request Created Successfully' };
   }
 
   async findAll() {
     const allRequests = await this.requestModel
       .find({ status: 0 })
       .sort({ createdAt: -1 })
-      .exec()
-      
+      .exec();
+
     return allRequests;
   }
 
@@ -111,7 +109,7 @@ export class RequestService {
       throw new BadRequestException('Update failed!');
     }
 
-    return { message: "Request update successfully" };
+    return { message: 'Request update successfully' };
   }
 
   // add spinner value
@@ -132,11 +130,11 @@ export class RequestService {
         },
       )
       .exec();
-  
+
     if (updatedRequest.modifiedCount !== 1) {
       throw new BadRequestException('Update failed!');
     }
-    return {message: "Spin result saved successfully"}
+    return { message: 'Spin result saved successfully' };
   }
 
   // request with spinner value

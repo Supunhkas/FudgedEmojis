@@ -17,8 +17,8 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import {toast} from "react-toastify"
-
+import { toast } from "react-toastify";
+import { FormControl, InputLabel, Select } from "@mui/material";
 
 function Copyright(props) {
   return (
@@ -46,7 +46,8 @@ export default function SignIn() {
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
     email: "",
-    password: "",
+    password: "", 
+    role: "user",
   });
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -57,30 +58,29 @@ export default function SignIn() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-  
+
     axios
       .post(`${baseUrl}/auth/login`, formData)
       .then((response) => {
         if (response) {
           localStorage.setItem("token", response.data.token);
           toast.success(response.data.message);
-  
+
           const decodedToken = jwt_decode(response.data.token);
           const username = decodedToken.name;
           const email = decodedToken.email;
           localStorage.setItem("name", username);
-          localStorage.setItem('userEmail', email)
-  
+          localStorage.setItem("userEmail", email);
+
           navigate("/");
-        } 
+        }
       })
       .catch((error) => {
-        
         toast.error(error.response.data.message);
         console.log("Error:", error);
       });
   };
-  
+
   return (
     <ThemeProvider theme={CustomTheme}>
       <Container component="main" maxWidth="xs">
@@ -139,6 +139,22 @@ export default function SignIn() {
               onChange={handleChange}
               autoComplete="current-password"
             />
+            <FormControl fullWidth>
+              <InputLabel htmlFor="role">User Role</InputLabel>
+              <Select
+                required
+                native
+                value={formData.role}
+                onChange={handleChange}
+                inputProps={{
+                  name: "role",
+                  id: "role",
+                }}
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </Select>
+            </FormControl>
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"

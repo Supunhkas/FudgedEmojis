@@ -70,7 +70,8 @@ export class RequestController {
     return this.requestService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Put('update/:id')
   update(@Param('id') id: string, @Body() dto: UpdateRequestDto) {
     return this.requestService.update(id, dto);
@@ -98,13 +99,15 @@ export class RequestController {
     return this.requestService.getAllRequestWithoutSpinner();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get('completed')
   getAllCompletedRequests() {
     return this.requestService.getAllCompletedRequests();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get('rejected')
   getAllRejectedRequests() {
     return this.requestService.getAllRejectedRequests();
@@ -112,7 +115,7 @@ export class RequestController {
 
   //email
   @UseGuards(JwtAuthGuard)
-  // @Roles(UserRole.ADMIN)
+ @Roles(UserRole.ADMIN)
   @Post('email/:id')
   async getEmail(@Body() emailData: any) {
     try {

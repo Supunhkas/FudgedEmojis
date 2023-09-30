@@ -57,9 +57,8 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
     axios
       .post(`${baseUrl}/request/add`, formData, config)
       .then((res) => {
- 
-        if (res.data.statusCode === 201) {
-          setConfirmLoading(false)
+        if (res.data && res.data.message === "Request created successfully") {
+          setConfirmLoading(false);
           toast.success("Successfully saved request");
           onRequestCreated();
           // Reset the form
@@ -67,10 +66,16 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
           setBillScreenshot(null);
           setBillAmount("");
           handleClose();
+        } else {
+          setConfirmLoading(false);
+          console.error("Error:", res.data);
+          setError("An error occurred while saving the request.");
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        setConfirmLoading(false);
+        console.error(error);
+        toast.error(" Request created failed ");
         setError("An error occurred while saving the request.");
       });
   };
@@ -89,6 +94,7 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
     setBillAmount(e.target.value);
   };
   const handleClose = () => {
+    console.log("Closing modal");
     setOpen(false);
     setError(null); 
   };
