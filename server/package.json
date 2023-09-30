@@ -6,13 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-<<<<<<< HEAD
-    "build": "nest build",
-=======
     "init": "npm i",
     "build": "nest build && npm run copy-templates",
     "copy-templates": "copyfiles -u 1 src/mail/templates/**/*.hbs dist/mail/templates",
->>>>>>> dev-backend
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",
     "start:dev": "nest start --watch",
