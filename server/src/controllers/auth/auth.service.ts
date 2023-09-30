@@ -16,6 +16,7 @@ import { UserRole } from '../../config/guards/roles.enum';
 import { AdminLoginDto } from './dto/admin.dto';
 import { Admin, AdminDocument } from 'src/schema/auth/admin.schema';
 import { AdminRegisterDto } from './dto/adminRegister.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -40,43 +41,50 @@ export class AuthService {
   }
 
   async create(dto: RegisterDto) {
+    const role = dto.role || UserRole.USER;
+
     const existUser = await this.userModel.findOne({ email: dto.email });
     if (existUser !== null) {
       throw new ConflictException('Email already exists');
     }
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const newUser = new this.userModel({
+      ...dto,
+      role: role,
+      password: hashedPassword,
+    });
 
-    const newUser = new this.userModel(dto);
-    newUser.role = UserRole.USER;
     return await newUser.save();
   }
 
   async createAdmin(dto: AdminRegisterDto) {
-    const existAdmin = await this.adminModel.findOne({ email: dto.email });
+    const existAdmin = await this.userModel.findOne({ email: dto.email });
     if (existAdmin !== null) {
       throw new ConflictException('Email already exists');
     }
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const newAdmin = new this.userModel({
+      ...dto,
+      role: UserRole.ADMIN,
+      password: hashedPassword,
+    });
 
-    const newAdmin = new this.adminModel(dto);
-    newAdmin.role = UserRole.ADMIN;
     return await newAdmin.save();
   }
 
   async login(dto: LoginDto) {
     try {
-      const existUser = await this.userModel.findOne({ email: dto.email });
+      const { email, password, role } = dto;
+      const existUser = await this.userModel.findOne({ email, role });
 
       if (!existUser) {
-        return {
-          statusCode: 401,
-          message: 'Email not found',
-        };
+        throw new ConflictException('Email not found');
       }
 
-      if (existUser.password !== dto.password) {
-        return {
-          statusCode: 401,
-          message: 'Incorrect password',
-        };
+      const passwordMatch = await bcrypt.compare(password, existUser.password);
+
+      if (!passwordMatch) {
+        throw new ConflictException('Incorrect password');
       }
 
       const payload: JwtPayload = {
@@ -89,61 +97,51 @@ export class AuthService {
       const token = await this.jwtProvider.generateToken(payload);
 
       return {
-        statusCode: 200,
         message: 'Login successful',
         token: token,
       };
     } catch (error) {
       console.error('Login error:', error);
 
-      return {
-        statusCode: 401,
-        message: 'Authentication failed',
-      };
+      throw error;
     }
   }
 
   // admin login
   async adminLogin(dto: AdminLoginDto) {
     try {
-      // Add logic to check if the user with the provided credentials is an admin
-      const existUser = await this.adminModel.findOne({ email: dto.email });
+      const existAdmin = await this.userModel.findOne({ email: dto.email });
 
-      if (!existUser) {
-        return {
-          statusCode: 401,
-          message: 'Email not found',
-        };
+      if (!existAdmin) {
+        throw new ConflictException('Email not found');
       }
 
-      if (existUser.password !== dto.password) {
-        return {
-          statusCode: 401,
-          message: 'Incorrect password',
-        };
+      const passwordMatch = await bcrypt.compare(
+        dto.password,
+        existAdmin.password,
+      );
+
+      if (!passwordMatch) {
+        throw new ConflictException('Incorrect password');
       }
 
       const payload: JwtPayload = {
-        name: existUser.firstName,
-        email: existUser.email,
-        _id: existUser._id,
-        role: existUser.role,
+        name: existAdmin.firstName,
+        email: existAdmin.email,
+        _id: existAdmin._id,
+        role: existAdmin.role,
       };
 
       const token = await this.jwtProvider.generateToken(payload);
 
       return {
-        statusCode: 200,
         message: 'Admin login successful',
         token: token,
       };
     } catch (error) {
       console.error('Admin login error:', error);
 
-      return {
-        statusCode: 401,
-        message: 'Authentication failed',
-      };
+      throw error;
     }
   }
 

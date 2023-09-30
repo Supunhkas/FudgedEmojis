@@ -16,6 +16,7 @@ import CustomTheme from "../components/CustomTheme";
 import logo from "../assets/logo.png";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
+import { FormControl, InputLabel, Select } from "@mui/material";
 
 function Copyright(props) {
   return (
@@ -41,32 +42,33 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   const [formData, setFormData] = React.useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "user",
   });
   const baseUrl = import.meta.env.VITE_BASE_URL;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
     axios
       .post(`${baseUrl}/auth/register`, formData)
       .then((res) => {
-        alert('Register Successfully')
-        navigate('/login')
+        alert("Register Successfully");
+        navigate("/login");
       })
       .catch((err) => {
         console.log(err);
-      })
+      });
   };
 
   return (
@@ -146,19 +148,36 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   onChange={handleChange}
-                 
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  name="confirmPassword" 
+                  name="confirmPassword"
                   label="Confirm Password"
                   type="password"
-                  id="confirmPassword" 
+                  id="confirmPassword"
                   onChange={handleChange}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel htmlFor="role">User Role</InputLabel>
+                  <Select
+                    required
+                    native
+                    value={formData.role}
+                    onChange={handleChange}
+                    inputProps={{
+                      name: "role",
+                      id: "role",
+                    }}
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </Select>
+                </FormControl>
               </Grid>
             </Grid>
             <Button

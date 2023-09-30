@@ -13,12 +13,12 @@ import { join } from 'path';
         port: 587, 
         secure: false, 
         auth: {
-          user: 'fudgedemoji@gmail.com',
-          pass: 'ruiwatofyhkcxvro',
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
         },
       },
       defaults: {
-        from: 'fudgedemoji@gmail.com',
+        from: process.env.DEFAULT,
       },
       
       template: {

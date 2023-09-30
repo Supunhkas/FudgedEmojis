@@ -8,6 +8,6 @@ export class JwtProvider {
 
   async generateToken(payload: JwtPayload) {
     const expiresIn = '24h';
-    return await this.jwtService.sign(payload, { expiresIn });
+    return this.jwtService.sign(payload, { expiresIn });
   }
 }

@@ -9,17 +9,17 @@ import { JwtProvider } from './jwt/jwt.provider';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { Admin, AdminSchema } from 'src/schema/auth/admin.schema';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: 'D9ik7Nw3xh',
-      signOptions: { expiresIn: '24h' },
+    JwtModule.registerAsync({
+      useFactory: async () => ({
+        secret: process.env.JWT_SECRET,
+        signOptions: { expiresIn: '24h' },
+      }),
     }),
-    
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtProvider, JwtStrategy],

@@ -40,43 +40,44 @@ export class RequestController {
     return result;
   }
 
-  // @UseGuards(JwtAuthGuard)
+   @UseGuards(JwtAuthGuard)
   @Get('all')
   async findAll() {
     return await this.requestService.findAll();
   }
   
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
  @Get('spinning')
   async getAllForSpin(){
     return await this.requestService.getAllForSpin();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('waiting')
   async getAllAcceptedToSpin(){
     return await this.requestService.getAllAcceptedToSpin();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('after-spin')
   async getAllAfterSpin(){
     return await this.requestService.getAllAfterSpin();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('getOne/:id')
   findOne(@Param('id') id: string) {
     return this.requestService.findOne(id);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Put('update/:id')
   update(@Param('id') id: string, @Body() dto: UpdateRequestDto) {
     return this.requestService.update(id, dto);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Put('addresult/:id')
   spinnerResult(@Param('id') id: string, @Body() dto: UpdateSpinDto) {
     return this.requestService.spinnerResult(id, dto);
@@ -98,21 +99,23 @@ export class RequestController {
     return this.requestService.getAllRequestWithoutSpinner();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get('completed')
   getAllCompletedRequests() {
     return this.requestService.getAllCompletedRequests();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get('rejected')
   getAllRejectedRequests() {
     return this.requestService.getAllRejectedRequests();
   }
 
   //email
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard)
+ @Roles(UserRole.ADMIN)
   @Post('email/:id')
   async getEmail(@Body() emailData: any) {
     try {

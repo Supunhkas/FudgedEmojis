@@ -9,7 +9,6 @@ import { UpdateRequestDto } from './dto/update-request.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request, RequestDocument } from 'src/schema/requests.schema';
 import { Model, Types } from 'mongoose';
-import { MailerService } from '@nestjs-modules/mailer';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateSpinDto } from './dto/update-sppin.dto';
 
@@ -34,7 +33,6 @@ export class RequestService {
       const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
       imageUrl = cloudinaryResponse.secure_url;
     }
-   
 
     const { spinBy, ...formData } = dto;
 
@@ -48,27 +46,23 @@ export class RequestService {
       voucherType: '',
       status: 0,
       spinBy: spinBy,
-      
     };
     const newRequest = new this.requestModel(requestData);
-    await newRequest.save();
+    const createdRequest = await newRequest.save();
 
-    return {
-      statusCode: 201,
-      message: 'Request created successfully',
-      data: newRequest,
-    };
+    if (!createdRequest) {
+      throw new Error('Request not Created');
+    }
+
+    return { message: 'Request Created Successfully' };
   }
 
   async findAll() {
     const allRequests = await this.requestModel
       .find({ status: 0 })
       .sort({ createdAt: -1 })
-      .exec()
-      .catch((error) => {
-        console.error(error);
-        throw new error();
-      });
+      .exec();
+
     return allRequests;
   }
 
@@ -107,7 +101,6 @@ export class RequestService {
   }
 
   async update(id: string, updateRequestDto: UpdateRequestDto) {
-    
     const updatedRequest = await this.requestModel
       .updateOne({ _id: id }, { $set: updateRequestDto })
       .exec();
@@ -116,8 +109,7 @@ export class RequestService {
       throw new BadRequestException('Update failed!');
     }
 
-
-    return { message: `Request update successfully` };
+    return { message: 'Request update successfully' };
   }
 
   // add spinner value
@@ -138,10 +130,11 @@ export class RequestService {
         },
       )
       .exec();
-    console.log(updatedRequest);
+
     if (updatedRequest.modifiedCount !== 1) {
       throw new BadRequestException('Update failed!');
     }
+    return { message: 'Spin result saved successfully' };
   }
 
   // request with spinner value
@@ -171,5 +164,4 @@ export class RequestService {
     const allRejected = await this.requestModel.find({ status: 9 }).exec();
     return allRejected;
   }
-
 }
