@@ -1,22 +1,15 @@
 import Title from 'antd/es/typography/Title'
 import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
-import axios from 'axios';
+import axios from "../../../axios-config";
 import moment from 'moment';
 
 const Rejected = () => {
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const accessToken = localStorage.getItem("token");
 
   const [rejectRequest,setRejectRequest] = useState([])
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    };
-    axios.get(`${baseUrl}/request/rejected`, config).then((res) => {
+
+    axios.get(`/request/rejected`).then((res) => {
       setRejectRequest(res.data)
     }).catch((err) => {
       console.log(err)

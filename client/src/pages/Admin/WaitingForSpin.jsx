@@ -1,7 +1,7 @@
 import Title from "antd/es/typography/Title";
 import React, { useEffect, useState } from "react";
 import { Space, Table, Tag } from "antd";
-import axios from "axios";
+import axios from "../../../axios-config";
 import moment from "moment";
 import { toast } from "react-toastify";
 import ReviewModal from "../../components/ReviewModel";
@@ -16,14 +16,9 @@ const WaitingForSpin = () => {
   const [selectedRequestData, setSelectedRequestData] = useState(null);
 
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    };
+   
     axios
-      .get(`${baseUrl}/request/waiting`, config)
+      .get(`/request/waiting`)
       .then((res) => {
         setWaitList(res.data);
       })
@@ -42,17 +37,11 @@ const WaitingForSpin = () => {
   const handleReject = (id) => {
     let requestId = id;
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    };
     const data = {
       status: 9,
     };
     axios
-      .put(`${baseUrl}/request/update/${requestId}`, data, config)
+      .put(`/request/update/${requestId}`, data)
       .then((res) => {
         toast.success("Request rejected successfully");
 
@@ -80,14 +69,8 @@ const WaitingForSpin = () => {
   const handleReview = (id) => {
     setSelectedRequestId(id);
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    };
     axios
-      .get(`${baseUrl}/request/getOne/${id}`, config)
+      .get(`/request/getOne/${id}`)
       .then((res) => {
         setSelectedRequestData(res.data);
         console.log(res.data);

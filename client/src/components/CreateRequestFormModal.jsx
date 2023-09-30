@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { TextField } from "@mui/material";
-import axios from "axios";
+import axios from "../../axios-config";
 import { toast } from "react-toastify";
 
 const style = {
@@ -37,7 +37,6 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
     // Here, you can handle form submission, e.g., sending data to the server
     const spinBy = localStorage.getItem("name");
     const userEmail = localStorage.getItem("userEmail");
-    console.log(userEmail);
 
     const formData = new FormData();
     formData.append("receiptNo", billNumber);
@@ -46,19 +45,13 @@ export default function CreateRequestFormModal({ onRequestCreated }) {
     formData.append("spinBy", spinBy);
     formData.append("createdUser", userEmail);
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
     axios
-      .post(`${baseUrl}/request/add`, formData, config)
+      .post(`/request/add`, formData)
       .then((res) => {
         setConfirmLoading(false);
+        console.log(res.data)
+        if (res.data) {
 
-        if (res.status === 200) {
           toast.success("Successfully saved request");
           onRequestCreated();
           // Reset the form

@@ -1,22 +1,15 @@
 import Title from 'antd/es/typography/Title'
 import React, { useEffect, useState } from 'react'
 import { Space, Table, Tag } from 'antd';
-import axios from 'axios'
+import axios from "../../../axios-config";
 import moment from 'moment'
 
 const Completed = () => {
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const accessToken = localStorage.getItem("token");
 
   const [request,setRequest] = useState([])
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    };
-    axios.get(`${baseUrl}/request/completed`, config).then((res) => {
+
+    axios.get(`/request/completed`).then((res) => {
       setRequest(res.data)
      
     }).catch((err) => {

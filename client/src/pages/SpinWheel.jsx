@@ -5,8 +5,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TopNavBar from "../components/TopNavBar";
 import WheelComponent from "../components/WheelComponent";
-import axios from "axios";
+import axios from "../../axios-config";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -39,33 +40,25 @@ function SimpleTabs() {
   const onFinished = (winner) => {
     setChances("0");
     saveResultToDatabase(winner, "Amazon");
-   
   };
   const onFinished2 = (winner) => {
     setChances("0");
     saveResultToDatabase(winner, "Shopify");
-    
   };
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const accessToken = localStorage.getItem("token");
+
 
   const saveResultToDatabase = (result, selectedTab) => {
     const parsedResult = parseInt(result, 10);
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    };
+   
     const data = {
       spinnerResult: parsedResult,
       voucherType: selectedTab,
     };
 
     axios
-      .put(`${baseUrl}/request/addresult/${id}`, data, config)
+      .put(`/request/addresult/${id}`, data)
       .then((response) => {
-       
+        toast.success("Result saved successfully");
         navigate("/");
       })
       .catch((error) => {

@@ -15,6 +15,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
+
 function App() {
 
   return (
@@ -26,6 +27,8 @@ function App() {
           <Route path='/register' element={<SignUp />} />
           <Route path='/' element={<UserDashboard />} />
           <Route path='/spin' element={<SpinWheel />} />
+    
+
 
           <Route path='admin' element={<AdminLayout />}>
             <Route path='new' element={<NewRequest />} />

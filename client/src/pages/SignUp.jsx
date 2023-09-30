@@ -14,7 +14,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CustomTheme from "../components/CustomTheme";
 import logo from "../assets/logo.png";
-import axios from "axios";
+import axios from "../../axios-config";
 import { Navigate, useNavigate } from "react-router-dom";
 import { FormControl, InputLabel, Select } from "@mui/material";
 
@@ -49,7 +49,6 @@ export default function SignUp() {
     confirmPassword: "",
     role: "user",
   });
-  const baseUrl = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
 
   const handleChange = (event) => {
@@ -61,7 +60,7 @@ export default function SignUp() {
     event.preventDefault();
 
     axios
-      .post(`${baseUrl}/auth/register`, formData)
+      .post(`/auth/register`, formData)
       .then((res) => {
         alert("Register Successfully");
         navigate("/login");
